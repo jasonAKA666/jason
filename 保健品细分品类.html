@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保健品细分品类</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .category-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .category-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section-header h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .subcategory {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .subcategory:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .subcategory-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .subcategory-header h3 {
+            font-size: 1.3em;
+            margin: 0;
+        }
+
+        .toggle-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .subcategory.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .subcategory-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .subcategory.expanded .subcategory-content {
+            max-height: 2000px;
+        }
+
+        .subcategory-inner {
+            padding: 25px;
+        }
+
+        .component-list {
+            margin-top: 15px;
+        }
+
+        .component-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .component-item h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .component-item p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #b6d4da;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+
+        .subsection-title {
+            color: #667eea;
+            margin: 20px 0 15px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>保健品细分品类交互式指南</h1>
+            <p>全面覆盖美国膳食补充剂市场的功能分类、目标人群、剂型创新、成分来源及标签诉求分析</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="搜索保健品类别、成分或功效..." id="searchBox">
+        </div>
+
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">主要功能类别</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25+</div>
+                <div class="stat-label">目标人群分类</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12+</div>
+                <div class="stat-label">剂型种类</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">成分来源分类</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>导航目录</h3>
+                <div class="nav-item">
+                    <button class="nav-link active" onclick="showSection('function')">按功能功效细分</button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link" onclick="showSection('demographics')">按人群细分</button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link" onclick="showSection('dosage-forms')">按剂型细分</button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link" onclick="showSection('ingredients')">按成分来源细分</button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link" onclick="showSection('labels')">按标签诉求细分</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- 按功能功效细分 -->
+                <div id="function" class="category-section active">
+                    <div class="section-header">
+                        <h2>按功能功效细分</h2>
+                        <p class="section-description">根据健康诉求和功能效果划分的保健品主要类别，涵盖从日常健康维护到特定健康问题的各个方面。</p>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>免疫支持 (Immune Support)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>旨在增强机体免疫系统，提高抵抗病毒、细菌等病原体的能力。典型诉求是在流感季节或提高日常免疫力。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>维生素C</h4>
+                                        <p>经典的免疫营养素，参与免疫细胞功能，是最常见的免疫支持成分之一。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素D</h4>
+                                        <p>调节免疫反应，缺乏维生素D与免疫功能下降相关。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>锌</h4>
+                                        <p>参与免疫细胞发育和功能，锌缺乏会显著影响免疫力。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>接骨木 (Elderberry)</h4>
+                                        <p>含有花青素和多酚，传统上用于感冒和流感的预防与治疗。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>紫锥菊 (Echinacea)</h4>
+                                        <p>北美草本植物，被认为能刺激免疫系统活性。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>大蒜提取物</h4>
+                                        <p>含有增强免疫反应的草本成分，具有抗菌抗病毒特性。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>药用蘑菇</h4>
+                                        <p>如灵芝、狮鬃菌等，含有β-葡聚糖等免疫调节成分。</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场地位：</strong>免疫支持是膳食补充剂中最热门的功效之一，在新产品中占据最高比重。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>心脏健康 (Cardiovascular Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>侧重于维护心血管系统功能，支持健康的胆固醇和血压水平，预防心脏疾病。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Omega-3鱼油</h4>
+                                        <p>促进心血管健康，可能降低心脏病风险，是心脏保健的核心成分。研究表明能够降低甘油三酯水平。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10 (CoQ10)</h4>
+                                        <p>被誉为"心脏发动机"，可用于预防心肌梗塞、心衰和心律不齐等，是欧美常见的心脏保健补充剂。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>大蒜精华</h4>
+                                        <p>有助于调节胆固醇和维持血管弹性，支持健康的血压水平。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>红曲米</h4>
+                                        <p>含有天然他汀类物质，有助于降低胆固醇水平。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>植物甾醇</h4>
+                                        <p>有助于降低胆固醇吸收，维护心血管健康。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁和维生素K2</h4>
+                                        <p>镁支持心肌功能，维生素K2有助于调节血管钙化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>消化健康 (Digestive & Gut Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>关注肠胃功能和消化系统平衡，减轻消化不良、腹胀、便秘等问题。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>益生菌</h4>
+                                        <p>有益菌群，可维持肠道微生物平衡，促进肠道健康。常见菌株包括乳酸杆菌和双歧杆菌。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>益生元</h4>
+                                        <p>如菊粉等，为有益菌提供养分，促进益生菌在肠道内的增殖。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>膳食纤维</h4>
+                                        <p>如洋车前子壳，帮助促进肠蠕动和规律排便，改善便秘问题。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>消化酶</h4>
+                                        <p>如淀粉酶、蛋白酶、脂肪酶等，辅助食物分解吸收，缓解消化不良。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>姜黄、生姜、薄荷</h4>
+                                        <p>草本成分，帮助消化和减少炎症，缓解胀气、腹痛等消化不适。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>代谢健康 (Metabolic Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>涵盖改善新陈代谢功能的补充剂，主要分为体重管理和血糖管理两方面。</p>
+                                
+                                <h4 class="subsection-title">体重管理 (Weight Management)</h4>
+                                <p>旨在促进脂肪代谢、抑制食欲或阻断碳水化合物吸收，以辅助减重。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>绿茶提取物</h4>
+                                        <p>儿茶素具有促进代谢作用，是天然的脂肪燃烧助剂。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Garcinia Cambogia</h4>
+                                        <p>柑橘果皮提取物，含HCA抑制脂肪合成，被认为可减少热量吸收。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>绿咖啡豆提取物</h4>
+                                        <p>含有绿原酸可调节葡萄糖代谢，从而控制体重，不影响其他营养摄入。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>共轭亚油酸 (CLA)</h4>
+                                        <p>一种脂肪酸，有研究指CLA可能减少脂肪堆积，常见于减脂产品中。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">血糖管理 (Blood Sugar Support)</h4>
+                                <p>主要针对糖代谢紊乱或2型糖尿病风险人群，辅助维持健康血糖水平。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>肉桂提取物</h4>
+                                        <p>传统的血糖调节成分，有助于提高胰岛素敏感性。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铬元素</h4>
+                                        <p>胰岛素作用的辅助因子，有助于改善胰岛素敏感性。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Gymnema Sylvestre (胰草)</h4>
+                                        <p>被称为"灭糖素"，能减少糖分吸收、降低血糖，并有助于控制甜食摄入。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>苦瓜提取物</h4>
+                                        <p>含有类似胰岛素的多肽，可降低血糖，被称为"植物胰岛素"。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>能量与运动表现 (Energy & Sports Performance)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>旨在提升精力、减轻疲劳，并增强运动表现和肌肉力量。</p>
+                                
+                                <h4 class="subsection-title">日常能量增强</h4>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>维生素B族</h4>
+                                        <p>参与能量代谢，是细胞产能的关键因子，帮助改善细胞能量产生。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铁质</h4>
+                                        <p>纠正缺铁性疲劳，支持氧气运输功能。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10</h4>
+                                        <p>其他能量因子，帮助改善细胞能量产生，提升活力。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>咖啡因、茶氨酸、牛磺酸</h4>
+                                        <p>常用于即刻提神抗疲劳，提供快速能量支持。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">运动营养与表现</h4>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>肌酸</h4>
+                                        <p>增加肌肉力量和爆发力，是运动营养的经典成分，提高短时高强度运动表现。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>支链氨基酸BCAA</h4>
+                                        <p>促进肌肉恢复，减少运动疲劳，支持肌肉蛋白合成。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>β-丙氨酸</h4>
+                                        <p>缓冲乳酸提高耐力，改善运动表现和训练效果。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>蛋白粉</h4>
+                                        <p>补充蛋白质以促进肌肉合成，是健身人群的基础营养。</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场数据：</strong>能量/运动类功效在北美新上市补充剂中占比约21%，是仅次于免疫和脑健康的热门功能领域。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>骨骼与关节健康 (Bone & Joint Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>帮助强化骨骼、维护关节灵活度，缓解关节疼痛，预防骨质疏松和关节炎等问题。</p>
+                                
+                                <h4 class="subsection-title">骨骼健康</h4>
+                                <p>主要针对提升骨密度和骨强度，预防或延缓骨质疏松。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>钙和维生素D</h4>
+                                        <p>促进钙吸收的黄金组合，被证明能够明显增加骨密度、预防各种类型的骨质疏松。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素K2</h4>
+                                        <p>帮助钙质正确沉积在骨骼中，防止钙在血管中沉积。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁</h4>
+                                        <p>参与骨骼形成过程，与钙协同作用维持骨骼健康。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">关节健康</h4>
+                                <p>针对关节软骨磨损、炎症和关节疼痛提供支持。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>葡萄糖胺和软骨素</h4>
+                                        <p>最常用的关节养护补剂，旨在修复关节软骨、减轻疼痛和僵硬，常配伍使用。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>MSM（二甲基砜）</h4>
+                                        <p>关节润滑和软骨支持成分，有助于维持关节灵活度。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>II型胶原</h4>
+                                        <p>支持关节软骨结构，可能有助于维护关节健康。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>姜黄（姜黄素）</h4>
+                                        <p>显示出减轻关节炎疼痛的效果，具有强力抗炎作用。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>乳香 (Boswellia)</h4>
+                                        <p>草本抗炎成分，可能减轻关节炎症状。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>脑部与认知健康 (Cognitive Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>提升大脑功能、记忆力和认知表现，改善记忆、提高专注力、预防或延缓与年龄相关的认知衰退。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>银杏叶提取物</h4>
+                                        <p>传统用来促进脑部血液循环，被认为可改善记忆和认知速度。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Omega-3脂肪酸（特别是DHA）</h4>
+                                        <p>是大脑结构的重要成分，有利于维持认知功能，支持记忆和学习能力。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>磷脂酰丝氨酸</h4>
+                                        <p>存在于脑细胞膜，有助于神经信号传递，对记忆力和大脑机能有积极影响。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>巴可巴 (Bacopa monnieri)</h4>
+                                        <p>草本nootropic，传统用于增强记忆和减少焦虑，有研究支持其改善认知处理能力。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素B族（B6、B12、叶酸）</h4>
+                                        <p>对神经系统健康重要，常用于降低同型半胱氨酸水平以保护大脑。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>抗氧化剂（维生素E、硒）</h4>
+                                        <p>通过减少神经氧化损伤，可能在一定程度上保护认知功能。</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场趋势：</strong>认知健康类产品在北美新补充剂功能定位中占据约1/3的比例，属于增长迅速的领域。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>情绪与压力管理 (Mood & Stress Support)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>减轻压力、焦虑，改善情绪和精神状态，帮助放松心情、缓解焦虑烦躁、提升抗压能力。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>圣约翰草 (St. John's Wort)</h4>
+                                        <p>用于轻中度抑郁情绪的草本补充剂，研究表明其对缓解轻至中度抑郁症状的效果可媲美抗抑郁药物。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>印度人参 (Ashwagandha)</h4>
+                                        <p>抗压适应原草本，被证实有助于降低应激激素水平、缓解压力，提高对焦虑的耐受。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>罗荛木 (Rhodiola)</h4>
+                                        <p>适应原草本，可能有助于降低应激激素水平并减轻焦虑症状。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁</h4>
+                                        <p>具有镇静神经系统的作用，有助于放松肌肉和神经，缓解焦虑和提升睡眠。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>L-茶氨酸</h4>
+                                        <p>存在于绿茶中，可促进大脑α波，带来放松且不嗜睡的效果。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>其他成分</h4>
+                                        <p>如5-HTP（提高血清素水平）、GABA、缬草等也用于放松情绪和减轻压力。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>睡眠支持 (Sleep Support)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>帮助改善睡眠质量和解决失眠困扰，帮助入睡、延长深度睡眠时间、提高睡眠质量而不形成依赖。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>褪黑素 (Melatonin)</h4>
+                                        <p>最常见的睡眠辅助补充剂，模拟人体天然的睡眠激素来调整睡眠节律，适用于倒时差或轻度失眠者。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>缬草 (Valerian Root)</h4>
+                                        <p>因其镇静安神作用广泛用于助眠配方，被证实可有效改善睡眠质量。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>啤酒花 (Hops)</h4>
+                                        <p>具有镇静效果的草本成分，常与缬草组合使用。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>洋甘菊 (Chamomile)</h4>
+                                        <p>温和的镇静草本，有助于放松和入睡。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁（氨基酸螯合镁）</h4>
+                                        <p>在平静神经、放松肌肉方面有助于促进睡眠。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>L-茶氨酸和GABA</h4>
+                                        <p>通过增加大脑放松信号协同改善睡眠质量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>眼部健康 (Eye Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>关注视力保护和眼睛机能保健，缓解眼疲劳、预防视力退化，特别是与年龄相关的黄斑变性和白内障等。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>叶黄素和玉米黄质</h4>
+                                        <p>存在于视网膜黄斑区域的类胡萝卜素，能够过滤有害蓝光并保护视网膜免受氧化损伤。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>越橘 (Bilberry)</h4>
+                                        <p>提取物和黑加仑等花青素，因其抗氧化和改善微循环作用，可减轻眼部疲劳。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>AREDS配方营养素</h4>
+                                        <p>维生素A、C、E以及锌、硒等，是AREDS研究确认的眼部健康营养素组合。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>小米草 (Eyebright)</h4>
+                                        <p>传统护眼草本，常见于护眼配方中。</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>应用人群：</strong>特别受到长期用眼（如电脑族）或中老年关注视力人群的青睐，通过提供眼部所需营养来缓解视疲劳、保护视力。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>美容养颜 (Skin, Hair & Nail Health)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>旨在从体内改善皮肤、头发和指甲的健康与外观，满足爱美人群"由内而外"的养护需求。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>胶原蛋白 (Collagen)</h4>
+                                        <p>皮肤真皮层的重要结构蛋白，口服胶原蛋白肽被认为可增加皮肤弹性、减淡细纹。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>生物素 (Biotin, 维生素B7)</h4>
+                                        <p>参与角蛋白合成，常用于防止脱发和促进指甲生长。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>透明质酸 (Hyaluronic Acid)</h4>
+                                        <p>人体天然保湿分子，可增加皮肤水分含量，让肌肤更水润饱满。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素C和E</h4>
+                                        <p>经典的抗氧化维生素，有助于胶原形成和抵抗自由基，对皮肤抗老化和修复很重要。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>硅和锌</h4>
+                                        <p>硅参与结缔组织形成，可强健指甲和头发；锌对于皮肤炎症和毛发生长都扮演重要角色。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>草本抗氧化剂</h4>
+                                        <p>如针叶樱桃（含天然维C）、葡萄籽提取物（富含原花青素）等，加强抗氧化护肤功效。</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场趋势：</strong>美肤美发类补充剂是近年来增长迅速的品类之一，通过提供构成皮肤/毛发的原料和抗氧化防护，来达到抗衰美容、光泽秀发的效果。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>抗衰老与长寿 (Healthy Aging & Longevity)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>延缓细胞老化、减少慢性疾病风险，追求"延年益寿"的综合健康收益。包括抗氧化防护、促进细胞能量代谢以及支持全身各系统机能。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>白藜芦醇 (Resveratrol)</h4>
+                                        <p>存在于红酒和葡萄皮中的著名抗氧化剂，动物研究显示出延长寿命的潜力，能够阻止胆固醇在血管沉积、防止心血管疾病。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>NAD+ 前体</h4>
+                                        <p>如烟酰胺核糖(NR)或烟酰胺单核苷酸(NMN)，在体内转化为NAD+，是细胞能量代谢和修复的关键辅酶。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10</h4>
+                                        <p>抗衰常用抗氧化剂，年龄增长时CoQ10水平下降，补充后有助于改善细胞能量生成和清除自由基。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>抗氧化营养素</h4>
+                                        <p>如硫辛酸、谷胱甘肽、维生素C/E、虾青素等，协同保护细胞免受氧化应激，理论上减缓衰老过程。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>益智补剂和抗炎草本</h4>
+                                        <p>如姜黄素等，因为慢性炎症和认知衰退都是老化表现，有时也归入抗衰老配方。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>其他功能分类</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">肝脏养护与排毒 (Liver Support & Detox)</h4>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>水飞蓟 (Milk Thistle)</h4>
+                                        <p>活性成分为水飞蓟素，具有强抗氧化和抗炎特性，被认为是"护肝草本"。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>朝鲜蓟提取物</h4>
+                                        <p>促进胆汁分泌，帮助脂肪代谢。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>N-乙酰半胱氨酸(NAC)</h4>
+                                        <p>谷胱甘肽前体，强化肝脏解毒能力。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">泌尿系统健康 (Urinary Tract Health)</h4>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>蔓越莓 (Cranberry)</h4>
+                                        <p>含有原花青素，被认为可以阻止细菌黏附在膀胱壁上，降低感染几率。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>D-甘露糖 (D-Mannose)</h4>
+                                        <p>天然糖分，通过与细菌结合并防止其附着在泌尿道上来预防感染。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">综合健康维护 (General Health & Wellness)</h4>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>综合维生素矿物质</h4>
+                                        <p>含有维生素A、B族、C、D、E、K以及主要矿物质的一定比例，确保日常所需微量营养素的摄入充分。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>抗氧化配方</h4>
+                                        <p>维生素C&E、β-胡萝卜素、辅酶Q10、硒、绿茶提取物、葡萄籽提取物等多种抗氧化剂组合。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>"绿色食品"粉剂</h4>
+                                        <p>混合多种蔬果浓缩物、藻类、草本和酵素的粉末，强调提供全谱营养和植物营养素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按人群细分 -->
+                <div id="demographics" class="category-section">
+                    <div class="section-header">
+                        <h2>按人群细分</h2>
+                        <p class="section-description">根据不同年龄、性别、生活方式和健康状况细分的目标消费群体及其特定营养需求。</p>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>年龄段人群分类</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">儿童（2～12岁）</h4>
+                                <p>重点关注骨骼发育、智力发展和免疫力建立，产品多以美味的软糖或液体形式提供。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>钙 + 维生素D</h4>
+                                        <p>支持骨骼和牙齿健康发育的黄金组合，确保生长期骨骼正常发育。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>DHA</h4>
+                                        <p>支持大脑和视力发育的关键Omega-3脂肪酸，对儿童智力发展至关重要。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>益生菌</h4>
+                                        <p>建立健康肠道菌群，支持消化和免疫系统发育。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>综合维生素</h4>
+                                        <p>儿童配方的综合维生素，通常以可爱造型和美味口感吸引儿童，如石器时代儿童维生素。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">青少年（13～17岁）</h4>
+                                <p>新陈代谢旺盛，学习和运动负荷增加，营养缺口和发育需求需兼顾。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>钙和维生素D</h4>
+                                        <p>青春期是骨量积累关键期，需要充足钙和维生素D以巩固骨骼。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铁质</h4>
+                                        <p>预防贫血，尤其是少女月经后对铁需求增大。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>锌</h4>
+                                        <p>支持生长发育和皮肤健康，因青春期皮肤问题对某些维生素矿物质的需求增加。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>青少年综合维生素</h4>
+                                        <p>专为青春期男女配方，女生侧重补铁，男生侧重锌镁等。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">中年人（40～60岁）</h4>
+                                <p>进入慢性病风险上升阶段，关注点在于维持活力与预防健康隐患。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Adults 50+ 综合维生素</h4>
+                                        <p>增加B族维生素和抗氧化剂，通常降低了铁含量，适合中年代谢需求。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Omega-3鱼油</h4>
+                                        <p>有益心脑血管健康，预防心血管疾病风险。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10</h4>
+                                        <p>心脏能量支持，抗氧化抗衰老，缓解中年疲劳。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>叶黄素</h4>
+                                        <p>眼部保健，预防黄斑变性，保护中年期视力健康。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">银发族（65岁以上）</h4>
+                                <p>关注延缓退化和提高生活质量，维持骨骼密度、保护心脑血管健康，支持认知功能和记忆。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>高剂量钙+维生素D</h4>
+                                        <p>老年女性每日需钙1200mg，维D水平也要足够，以预防骨质流失。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素B12</h4>
+                                        <p>老年人吸收B12能力下降，补充有助于防止贫血和认知功能下降。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Omega-3鱼油</h4>
+                                        <p>DHA/EPA有益于认知和心脏，可能降低认知退化风险。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>叶黄素/玉米黄质</h4>
+                                        <p>保护视力，预防老年黄斑变性，维护老年期视觉健康。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>老年综合维生素</h4>
+                                        <p>如Centrum Silver系列，特别强化维生素D、B12、钙，并减少铁含量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>性别及生理阶段人群</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">女性健康 (Women's Health)</h4>
+                                <p>面向女性特殊生理需求的补充剂，涵盖生理周期调节、更年期支持、生育与孕期营养等方面。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>铁 + 叶酸组合</h4>
+                                        <p>经期失血使女性铁需求较男性高，叶酸足量有助于预防孕期神经管缺陷。女性综合维生素通常含较高剂量的铁和叶酸。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>经前综合征调理</h4>
+                                        <p>柴胡果（Chasteberry）平衡荷尔蒙，月见草油（EPO）减轻经前乳房胀痛，维生素B6、镁缓解经前焦虑。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>更年期支持</h4>
+                                        <p>黑升麻缓解潮热盗汗，大豆异黄酮作为植物性雌激素，维生素D+钙针对更年期骨流失。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>泌尿及私密健康</h4>
+                                        <p>蔓越莓、高剂量D-甘露糖、益生菌（特别是含女性阴道益生菌株），维护泌尿生殖道的菌群平衡。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">男性健康 (Men's Health)</h4>
+                                <p>针对男性特有健康需求的补充剂，包括前列腺保健、睾酮支持和性功能提升等。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>前列腺健康</h4>
+                                        <p>锯棕榈缓解前列腺增生症状，番茄红素、南瓜籽提取物支持前列腺功能，硒元素和维生素E抗氧化保护。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>睾酮与活力</h4>
+                                        <p>特猫尾草（东革阿里）、刺蒺藜、葫芦巴等植物成分，维生素D和锌对正常睾酮水平的维持。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>男性综合维生素</h4>
+                                        <p>通常不含铁或仅含极微量，更强调抗氧化和代谢支持，如增加维生素C、E和锌、硒等。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>男性性功能</h4>
+                                        <p>淫羊藿、玛咖、L-精氨酸等安全草本和氨基酸，辅助男性生理机能。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">孕产妇 (孕期及哺乳期女性)</h4>
+                                <p>孕期及哺乳期女性对于营养的需求显著提高，以支持胎儿发育和母体健康。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>产前复合维生素 (Prenatal Vitamins)</h4>
+                                        <p>富含叶酸（800μg）、铁（27mg）、钙和维生素D、碘（150μg），是孕期的基础营养支持。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>DHA产前鱼油</h4>
+                                        <p>有利于胎儿大脑和视网膜发育，建议每日200-300mg DHA摄入。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>孕期专用益生菌</h4>
+                                        <p>维护孕期肠道健康，支持免疫系统正常运行。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>哺乳期营养</h4>
+                                        <p>继续钙+维D补充（1000~1300mg钙），铁质恢复储备，DHA支持婴儿发育，碘满足泌乳需求（290μg）。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">更年期女性</h4>
+                                <p>绝经前后阶段由于雌激素水平骤降，带来潮热盗汗、情绪波动、骨质流失和心血管风险上升等健康挑战。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>植物雌激素</h4>
+                                        <p>大豆异黄酮、红三叶草提取物、亚麻籽木酚素等，发挥弱雌激素作用，减轻更年期症状。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>黑升麻 (Black Cohosh)</h4>
+                                        <p>北美草药，被广泛用于缓解潮热和盗汗，是研究最多的更年期草本之一。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>钙和维生素D</h4>
+                                        <p>绝经后女性骨质流失加速，建议每天1200mg钙和800-1000IU维D。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>其他支持成分</h4>
+                                        <p>镁有助睡眠和情绪稳定，维生素B6、B12、叶酸帮助减轻情绪症状，圣约翰草用于情绪低落。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>生活方式人群</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">运动健身人群</h4>
+                                <p>经常运动、健身及竞技体育人群由于训练需要，在营养补充方面有特殊偏好，被称为运动营养补剂（Sports Nutrition）。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>蛋白质补剂</h4>
+                                        <p>如乳清蛋白粉、酪蛋白粉、大豆蛋白粉等。约42%美国大学运动员使用蛋白质类补剂，有助于肌肉修复和增长。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>肌酸 (Creatine)</h4>
+                                        <p>公认有效的力量和爆发力补剂，约14%的大学运动员报告服用肌酸，一般推荐剂量为每日3-5克。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>氨基酸类</h4>
+                                        <p>支链氨基酸（BCAA）减缓肌肉分解、减轻疲劳；精氨酸、谷氨酰胺分别用于促进血流和肌肉恢复。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>能量促进剂</h4>
+                                        <p>咖啡因提高警觉和耐力，28.6%的大学运动员使用能量饮料。瓜拉那、茶碱等常见于"Pre-workout"产品。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>减脂类</h4>
+                                        <p>"燃脂剂"含咖啡因、绿茶提取物（EGCG）、共轭亚油酸（CLA）、左旋肉碱等，据称加速脂肪燃烧。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">夜班人群</h4>
+                                <p>需要轮班、值夜班的人群面临昼夜节律紊乱和睡眠不足等问题。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>褪黑素 (Melatonin)</h4>
+                                        <p>帮助调整睡眠-清醒周期，在白天服用可促使大脑产生睡意，重新同步生理节律。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素D</h4>
+                                        <p>夜班族日照时间显著减少，需额外补充1000~2000IU以弥补日照不足。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁</h4>
+                                        <p>有助于放松神经肌肉、改善睡眠质量，推荐睡前补充200~400mg镁。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素B12</h4>
+                                        <p>部分夜班者报告白天精神不振，B12等B族维生素有助于提升精力代谢。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">经常出差者/旅行人群</h4>
+                                <p>频繁旅行、跨时区出差的人群面对时差紊乱、旅途疲劳和环境变化带来的免疫挑战。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>时差调整</h4>
+                                        <p>褪黑素是调整时差的首选，镁、L-茶氨酸、缬草根帮助在新时区放松入眠。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>免疫支持</h4>
+                                        <p>维生素C和锌的经典组合，每日500-1000mg维C与锌一起服用可缩短感冒病程。接骨木因抗病毒抗氧化效果受欢迎。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>肠道健康</h4>
+                                        <p>益生菌补充剂可帮助保持肠道菌群平衡，降低水土不服和饮食改变引起的腹泻风险。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>电解质补充</h4>
+                                        <p>长途飞行易脱水，补充电解质冲剂可预防轻度脱水和疲劳加剧。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>饮食偏好人群</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">素食者/纯素者</h4>
+                                <p>素食或纯素人群由于饮食中限制了动物来源食物，某些营养素容易摄入不足或缺乏可靠来源。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>维生素B12</h4>
+                                        <p>这是纯素饮食最突出的缺项，几乎仅存在于动物性食物中。建议纯素者必须经常补充B12（每日50~250μg）。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铁</h4>
+                                        <p>植物中的铁为非血红素铁，吸收率远低于动物来源铁，建议素食者铁摄入量比普通人高出近一倍。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>钙和维生素D</h4>
+                                        <p>严格素食者不饮牛奶，容易缺钙；若日晒不足，则维D也可能不足。植物来源的维D专为素食者设计。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Omega-3脂肪酸（DHA/EPA）</h4>
+                                        <p>主要存在于鱼类，对素食人群，藻油DHA补充是理想选择，每日200-300mg即可弥补不吃鱼的缺憾。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>其他营养素</h4>
+                                        <p>碘（若不使用加碘盐需补充）、锌（植物来源吸收率较低）、维生素K2等。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">无麸质饮食人群</h4>
+                                <p>遵循无麸质饮食的人群（典型为乳糜泻患者）因需长期避免小麦、黑麦、大麦等麸质谷物，可能面临营养摄入不足。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>多种维生素补充</h4>
+                                        <p>无麸质替代品往往未强化等量营养，容易缺乏叶酸和某些B族维生素、铁等。建议每日服用复合维生素矿物质。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铁</h4>
+                                        <p>乳糜泻常以缺铁性贫血为首发表现，即使严格无麸质饮食后，成年人群中仍有约40%可能持续缺铁。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>钙和维生素D</h4>
+                                        <p>乳糜泻者粘膜受损时钙和维D吸收受影响，需额外补充钙+D来预防骨质疏松。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>其他矿物质</h4>
+                                        <p>镁、锌、铜的缺乏在乳糜泻患者中比例较高，一些综合矿物质片对这人群有益。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>特殊健康状况人群</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <h4 class="subsection-title">超重/肥胖人群</h4>
+                                <p>超重及肥胖人群通常一方面寻求减重或控制体重，另一方面关注代谢健康和心血管风险的管理。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>热量消耗/燃脂剂</h4>
+                                        <p>咖啡因和各种草本兴奋剂、茶多酚（EGCG）、辣椒素等，宣称提高新陈代谢率、增加热量消耗。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>食欲抑制/饱腹剂</h4>
+                                        <p>葡甘露聚糖、车前子壳等可溶纤维，餐前服用可吸水膨胀减少饥饿感。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>代谢调节剂</h4>
+                                        <p>共轭亚油酸（CLA）、左旋肉碱、绿咖啡豆提取物等，试图通过影响代谢途径来帮助减肥。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>血糖支持</h4>
+                                        <p>铬、肉桂提取物、α-硫辛酸等，有助改善胰岛素敏感性和血糖稳定。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">乳糖不耐受人群</h4>
+                                <p>乳糖不耐受者由于缺乏足够的乳糖酶，不能正常消化乳糖，关注如何改善对乳制品的耐受和弥补营养缺失。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>乳糖酶补充剂</h4>
+                                        <p>口服乳糖酶片剂在摄入乳制品前服用，可替代体内酶帮助分解乳糖，显著改善消化症状。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>钙和维生素D补充</h4>
+                                        <p>乳制品是膳食钙和维D的重要来源，乳糖不耐受者需通过补充剂获取，通常每日补充钙1000mg和维D 800-1200IU。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>益生菌</h4>
+                                        <p>特定的益生菌菌株能部分分解乳糖，改善肠道微生态，从而提高乳糖耐受度。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">糖尿病/血糖偏高人群</h4>
+                                <p>糖尿病患者或血糖管理需求高的人群，保健品重点围绕平稳血糖、提高胰岛素敏感性以及预防并发症。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>铬 (Chromium)</h4>
+                                        <p>胰岛素作用的辅助因子，研究表明补充铬可能对2型糖尿病患者的血脂和血糖有小幅改善作用。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>肉桂 (Cinnamon)</h4>
+                                        <p>有些临床试验显示肉桂能够降低空腹血糖和改善HbA1c，被视为天然的胰岛素增敏剂。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>α-硫辛酸 (ALA)</h4>
+                                        <p>抗氧化剂，在糖尿病并发症（如神经病变）上有一定应用，可减轻糖尿病周围神经痛。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Omega-3鱼油</h4>
+                                        <p>重点在心血管保护，可以降低甘油三酯、轻度降压并抗炎，建议1000mg以上EPA+DHA。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>小檗碱 (Berberine)</h4>
+                                        <p>从黄连等中草药提取，有相当研究显示其降糖效果可媲美二甲双胍，被越来越多欧美消费者关注。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">高血压人群</h4>
+                                <p>高血压患者及有血压偏高趋势的人，希望通过营养干预来辅助血压控制和心血管健康。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>镁</h4>
+                                        <p>被广泛证明对降低血压有益，补充每日约365-450mg镁平均3个月，可显著降低收缩压和舒张压。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>钾</h4>
+                                        <p>可拮抗钠对血压的影响，促进钠排出并放松血管，增加钾摄入能明显降低高血压人群的血压。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>鱼油（Omega-3）</h4>
+                                        <p>EPA/DHA有一定降压效果，Omega-3补充可使高血压患者收缩压降低约4-5 mmHg。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10</h4>
+                                        <p>一些小规模试验发现CoQ10补充（100-200mg/天）可降低血压，可能与改善心肌能量代谢有关。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>大蒜提取物</h4>
+                                        <p>大蒜素具有舒张血管和轻度利尿作用，有荟萃分析显示大蒜补充剂可降低血压。</p>
+                                    </div>
+                                </div>
+
+                                <h4 class="subsection-title">认知退化/记忆力下降人群</h4>
+                                <p>多为中老年人，担心认知功能减退，或已出现轻度认知障碍甚至阿尔茨海默症初期迹象。</p>
+                                
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Omega-3脂肪酸（特别是DHA）</h4>
+                                        <p>大脑中约有60%是脂质，DHA是脑细胞膜的重要组成部分，高鱼类摄入与认知退化风险较低相关。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>B族维生素（叶酸、B6、B12）</h4>
+                                        <p>参与同型半胱氨酸代谢，补充可降低同型半胱氨酸，有可能减缓大脑萎缩速率。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>银杏叶提取物 (Ginkgo Biloba)</h4>
+                                        <p>欧美最知名的植物健脑补剂，据称通过改善脑部血流、抗氧化来增强记忆。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>磷脂酰丝氨酸 (PS)</h4>
+                                        <p>脑细胞膜磷脂之一，部分人类试验显示PS对老年记忆力有小幅改善。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素E和C</h4>
+                                        <p>抗氧化剂，在大脑中清除自由基，保护神经元膜不受氧化伤害。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按剂型细分 -->
+                <div id="dosage-forms" class="category-section">
+                    <div class="section-header">
+                        <h2>按剂型细分</h2>
+                        <p class="section-description">从传统的片剂、胶囊到创新的软糖、口腔薄膜等多样化剂型，满足不同消费者的服用偏好和需求。</p>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>传统剂型</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>片剂 (Tablets)</h4>
+                                        <p>将有效成分和赋形剂压制成的固体剂型，是最经典的补充剂形式。具有剂量准确、稳定性好且成本低的优点。</p>
+                                        <span class="tag">高稳定性</span>
+                                        <span class="tag">成本低</span>
+                                        <span class="tag">剂量精确</span>
+                                        <div class="warning-box" style="margin-top: 10px;">
+                                            <strong>注意：</strong>需要用水送服，起效有一定延迟，对于儿童和老年人等吞咽能力较弱的人群可能难以下咽。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>硬胶囊 (Hard-shell Capsules)</h4>
+                                        <p>由明胶或植物胶皮制成的两节壳体，内填充粉末或小丸。表面光滑，能够掩盖内容物的不良气味和味道。</p>
+                                        <span class="tag">易吞服</span>
+                                        <span class="tag">遮味好</span>
+                                        <span class="tag">生物利用度高</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>优势：</strong>相比片剂，胶囊常能提供更高的生物利用度，生产工艺成熟，在某些条件下每剂成本可比片剂低约50％。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>软胶囊/软凝胶 (Softgel Capsules)</h4>
+                                        <p>软质明胶制作的密封胶囊，内部充填油剂或半固体。非常适合封装油溶性维生素和营养油，保护易氧化的成分。</p>
+                                        <span class="tag">适合油脂</span>
+                                        <span class="tag">吸收快</span>
+                                        <span class="tag">防氧化</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>粉剂 (Powders)</h4>
+                                        <p>由固体松散粉末组成的剂型，可散装于罐中按剂量勺取，或预分装成单次剂量的小袋。</p>
+                                        <span class="tag">剂量灵活</span>
+                                        <span class="tag">适合大剂量</span>
+                                        <span class="tag">起效快</span>
+                                        <p style="margin-top: 10px;">特别适合需要大剂量摄入某种营养素的情况，如蛋白粉补充、多种益生菌粉等。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>液体剂型 (Liquids)</h4>
+                                        <p>以液态形式提供营养成分的制剂，包括口服溶液、糖浆、混悬液等多种形式。</p>
+                                        <span class="tag">无需吞咽</span>
+                                        <span class="tag">吸收快</span>
+                                        <span class="tag">适合特殊人群</span>
+                                        <p style="margin-top: 10px;">极大地方便了儿童和吞咽困难的老年人，营养已预先溶解，可更快速地被机体吸收。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>现代/创新剂型</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>软糖剂型 (Gummy Supplements)</h4>
+                                        <p>近年来增长最快的补充剂形式之一。软糖形状多样、颜色鲜艳、口味可口，宛如果味糖果，服用体验极佳。</p>
+                                        <span class="tag">口感佳</span>
+                                        <span class="tag">高依从性</span>
+                                        <span class="tag">增长迅速</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场数据：</strong>全球软糖维生素市场规模从2023年的约246亿美元预计增至2028年的485亿美元，年复合增长率达14.5%。
+                                        </div>
+                                        <div class="warning-box" style="margin-top: 10px;">
+                                            <strong>注意：</strong>大多数软糖含有糖分，营养含量有限，单颗软糖的有效成分含量通常不到总重量的10%。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>咀嚼片 (Chewable Tablets)</h4>
+                                        <p>可以直接咀嚼碎后吞咽的固体片剂。优质的咀嚼片通过配方调味，拥有令人愉快的口味和质地。</p>
+                                        <span class="tag">高营养含量</span>
+                                        <span class="tag">低糖</span>
+                                        <span class="tag">适合全年龄</span>
+                                        <p style="margin-top: 10px;">咀嚼片能够提供比软糖更高剂量的营养，活性成分的占比可达到50%左右，而软糖通常不超过10%。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>泡腾片 (Effervescent Tablets)</h4>
+                                        <p>需要溶解于水后服用的剂型。在遇水时会迅速产生气泡，将自身溶解成一杯均匀的营养饮料。</p>
+                                        <span class="tag">温和吸收</span>
+                                        <span class="tag">补水兼顾</span>
+                                        <span class="tag">口感好</span>
+                                        <p style="margin-top: 10px;">有效成分已经均匀分散，进入体内的吸收非常充分，对胃黏膜的刺激较小，更温和不伤胃。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>快速溶解片 (Fast-Dissolving Tablets)</h4>
+                                        <p>能够放入口中无需水，在数十秒内迅速崩解溶解的片剂。只需将其置于舌面或口中含服即可。</p>
+                                        <span class="tag">无需水</span>
+                                        <span class="tag">便携</span>
+                                        <span class="tag">快速起效</span>
+                                        <p style="margin-top: 10px;">极适合旅行途中、乘车时或任何无法方便取得水的时候服用，对于吞咽困难的人来说非常安全、轻松。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>含片/口含片 (Lozenges/Buccal Tablets)</h4>
+                                        <p>置于口中缓慢溶解的片剂或糖锭，通过口腔黏膜和咽部粘膜吸收有效成分。</p>
+                                        <span class="tag">局部作用</span>
+                                        <span class="tag">绕过胃酸</span>
+                                        <span class="tag">持续释放</span>
+                                        <p style="margin-top: 10px;">常见如锌含片（用于缩短感冒周期）、维生素C含片，可以部分绕过胃酸破坏，让有效成分在口腔就开始吸收。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>舌下片 (Sublingual Tablets)</h4>
+                                        <p>专门用于舌下含服的片剂，置于舌下，经由舌下丰富的毛细血管网吸收药物。</p>
+                                        <span class="tag">快速起效</span>
+                                        <span class="tag">高吸收率</span>
+                                        <span class="tag">绕过首过代谢</span>
+                                        <p style="margin-top: 10px;">舌下静脉直接汇入体循环，可以绕过胃肠道和肝脏首过代谢，通常几分钟内可达到有效血浓度。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>口腔薄膜 (Oral Thin Films)</h4>
+                                        <p>超薄的可食用膜剂，将其贴附在舌面或颊黏膜上即可快速溶解释药。厚度仅几十微米。</p>
+                                        <span class="tag">创新剂型</span>
+                                        <span class="tag">隐蔽服用</span>
+                                        <span class="tag">快速溶解</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场趋势：</strong>全球营养口腔薄膜市场规模将从2024年的约24.5亿美元增至2033年的58亿美元，年均增长率超过10%。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>口服喷雾 (Oral Sprays)</h4>
+                                        <p>通过喷嘴将营养液体喷射入口腔，经口腔黏膜吸收或咽下的一种给药方式。瓶身小巧，喷头设计可控制每喷剂量。</p>
+                                        <span class="tag">使用简单</span>
+                                        <span class="tag">黏膜吸收</span>
+                                        <span class="tag">无腥味</span>
+                                        <p style="margin-top: 10px;">对准口腔一喷即可，无需水和吞咽动作，将营养制剂雾化成细小液滴，直接喷洒在毛细血管丰富区域。</p>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Stick Pack 条状包装 (单剂量条包)</h4>
+                                        <p>细长条状的小袋，每袋容纳一次服用量的产品，撕开即可倒入口中或倒入水中服用。</p>
+                                        <span class="tag">便携性强</span>
+                                        <span class="tag">单次剂量</span>
+                                        <span class="tag">保鲜好</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>增长趋势：</strong>全球营养品Stick Pack市场将从2023年的约24.5亿美元增长到2033年的51.6亿美元，年复合增长率约10.8%。
+                                        </div>
+                                        <p style="margin-top: 10px;">提供了无可比拟的便携性和便利性，消费者可以在上班前将条包放进背包，旅途中携带也几乎不占空间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按成分来源细分 -->
+                <div id="ingredients" class="category-section">
+                    <div class="section-header">
+                        <h2>按成分来源细分</h2>
+                        <p class="section-description">根据原料来源的不同，保健品成分可分为植物、动物、微生物、矿物、合成、海洋和发酵七大类别。</p>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>植物来源成分 (Plant-based Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>从各种植物（包括草本、中草药、水果、蔬菜等）中提取或加工而成的原料，以"天然"形象深受消费者青睐。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>姜黄 (Turmeric)</h4>
+                                        <p>含有姜黄素，具有抗炎和抗氧化作用，可用于支持关节健康和炎症管理。经常出现在有机或非转基因标签的植物配方产品中。</p>
+                                        <span class="tag">Vegan</span>
+                                        <span class="tag">Organic</span>
+                                        <span class="tag">Gluten-Free</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>银杏叶 (Ginkgo Biloba)</h4>
+                                        <p>以改善记忆力和认知功能著称，富含黄酮类和萜内酯，被用于支持健康的血液循环与大脑机能。</p>
+                                        <span class="tag">脑健康</span>
+                                        <span class="tag">记忆支持</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>人参 (Ginseng)</h4>
+                                        <p>著名的中草药成分，包括亚洲人参和美洲人参两大类。被视为适应原，传统上用于增强能量、免疫力和缓解压力。</p>
+                                        <span class="tag">适应原</span>
+                                        <span class="tag">增强能量</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>圣约翰草 (St. John's Wort)</h4>
+                                        <p>一种开花植物提取物，用于情绪支持和轻度抑郁情绪的调节。作用于神经递质，需注意与处方药的相互作用。</p>
+                                        <span class="tag">情绪支持</span>
+                                        <span class="tag">天然草本</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>紫锥菊 (Echinacea)</h4>
+                                        <p>北美草本植物，用于支持免疫系统，预防感冒等。在"天然/有机"感冒预防产品中常见。</p>
+                                        <span class="tag">免疫支持</span>
+                                        <span class="tag">天然来源</span>
+                                    </div>
+                                </div>
+                                <div class="warning-box">
+                                    <strong>注意：</strong>某些草本产品存在品质参差或掺假污染的风险，例如有报告显示相当比例的草药补充剂被检出含有铅等重金属污染。
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场趋势：</strong>植物来源的膳食补充剂增长显著，消费者倾向认为天然植物成分更温和、易被身体吸收。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>动物来源成分 (Animal-derived Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>直接取自动物组织、提取物或动物副产品的原料，往往富含独特的营养物质而具有保健作用。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>鱼油 (Fish Oil，富含Omega-3)</h4>
+                                        <p>提取自深海鱼类，富含EPA和DHA等Omega-3脂肪酸，以其心血管健康益处著称，是美国最常见的膳食补充剂之一。</p>
+                                        <span class="tag">心脏健康</span>
+                                        <span class="tag">非Vegan</span>
+                                        <span class="tag">Gluten-Free</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>胶原蛋白 (Collagen)</h4>
+                                        <p>来自牲畜或鱼类的结缔组织，是皮肤、美容类补充剂的明星成分，可能促进皮肤弹性、减少皱纹，并支持关节软骨健康。</p>
+                                        <span class="tag">美容</span>
+                                        <span class="tag">关节健康</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>蜂产品 (蜂蜜、蜂胶、蜂王浆)</h4>
+                                        <p>蜂胶用于免疫支持和抗菌抗氧化；蜂王浆富含维生素和生物活性物质，常用于增强体质和美容。</p>
+                                        <span class="tag">天然来源</span>
+                                        <span class="tag">免疫支持</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>软骨提取物</h4>
+                                        <p>软骨素是关节保健品的重要成分，现在更多来自可持续来源（如牛软骨），与氨基葡萄糖常搭配用于减轻骨关节炎症状。</p>
+                                        <span class="tag">关节保健</span>
+                                        <span class="tag">可持续来源</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>氨基葡萄糖 (Glucosamine)</h4>
+                                        <p>传统上从虾蟹等甲壳类的壳中提取，有助于缓解骨关节炎的疼痛和改善关节活动度。现在也有植物来源版本。</p>
+                                        <span class="tag">关节健康</span>
+                                        <span class="tag">需注意过敏</span>
+                                    </div>
+                                </div>
+                                <div class="warning-box">
+                                    <strong>安全提醒：</strong>需注意过敏和污染等潜在风险。鱼油产品需要保证纯度以避免重金属积累；贝类提取物可能对甲壳类过敏人群造成严重过敏反应。
+                                </div>
+                                <div class="info-box">
+                                    <strong>替代趋势：</strong>近年市场上出现用植物或发酵来源替代动物来源的趋势，如以海藻油替代鱼油，以植物性胶原助剂替代动物胶原。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>微生物来源成分 (Microbial-derived Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>由细菌、真菌、藻类等微生物直接提供或经培养获得的原料，许多营养物质可以通过发酵大规模生产。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>乳酸菌益生菌</h4>
+                                        <p>如嗜酸乳杆菌和双歧杆菌，是最常见的益生菌，广泛用于维护肠道菌群平衡、促进消化和免疫功能。</p>
+                                        <span class="tag">Vegan</span>
+                                        <span class="tag">Dairy-Free</span>
+                                        <span class="tag">肠道健康</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>酵母及酵母提取物</h4>
+                                        <p>酵母β-葡聚糖可增强免疫反应，营养酵母富含B族维生素和蛋白质，常为素食者提供营养。</p>
+                                        <span class="tag">免疫支持</span>
+                                        <span class="tag">纯素适用</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>螺旋藻 (Spirulina)</h4>
+                                        <p>一种蓝绿藻，富含植物蛋白、维生素B、铁和抗氧化色素，被视为"超级食物"，适合纯素人群。</p>
+                                        <span class="tag">超级食物</span>
+                                        <span class="tag">Non-GMO</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>小球藻 (Chlorella)</h4>
+                                        <p>单细胞绿藻，含有丰富的叶绿素、蛋白质和微量元素，据称有排毒、促进免疫等作用。</p>
+                                        <span class="tag">排毒</span>
+                                        <span class="tag">破壁技术</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>真菌类提取物（药用蘑菇）</h4>
+                                        <p>如灵芝、狮鬃菌、冬虫夏草等，含有独特的神经生长因子刺激物质或多糖，用于免疫调节和认知功能支持。</p>
+                                        <span class="tag">传统药用</span>
+                                        <span class="tag">免疫调节</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场接受度：</strong>美国消费者对肠道健康和免疫调节的认知提高，越来越多的人日常服用益生菌。微藻如螺旋藻、小球藻被视为"超级食物"，在天然营养品市场也很流行。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>矿物来源成分 (Mineral-derived Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>直接来自无机矿物或元素的补充剂原料，如钙、镁、铁、锌等人体必需矿物质，大多通过矿石开采提纯获得。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>钙 (Calcium)</h4>
+                                        <p>人体含量最丰富的矿物，主要用于骨骼和牙齿健康。常见形式有碳酸钙、柠檬酸钙等，常与维生素D搭配促进吸收。</p>
+                                        <span class="tag">骨骼健康</span>
+                                        <span class="tag">Vegan</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>镁 (Magnesium)</h4>
+                                        <p>参与数百种体内酶反应，支持肌肉神经功能和心脏健康。有助于放松情绪和改善睡眠，近年来非常流行。</p>
+                                        <span class="tag">助眠</span>
+                                        <span class="tag">抗压力</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>铁 (Iron)</h4>
+                                        <p>补铁用于预防和纠正缺铁性贫血，常见于女性健康、孕期维生素中。过量铁会引起胃肠不适甚至中毒。</p>
+                                        <span class="tag">女性健康</span>
+                                        <span class="tag">需控制剂量</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>锌 (Zinc)</h4>
+                                        <p>重要的免疫和酶系统元素，在感冒季节常见于增强免疫的配方。补锌有助缩短感冒持续时间，也用于皮肤健康。</p>
+                                        <span class="tag">免疫支持</span>
+                                        <span class="tag">皮肤健康</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>硒 (Selenium)</h4>
+                                        <p>作为抗氧化相关酶的辅因子，小剂量即可发挥作用。适度补硒可支持免疫和甲状腺功能。</p>
+                                        <span class="tag">抗氧化</span>
+                                        <span class="tag">甲状腺支持</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>植物基趋势：</strong>当前一个趋势是推崇"植物基矿物质"，即从植物或海藻中获得矿物，例如从红海藻中提取有机钙、镁，声称比岩石矿物更易被人体识别和吸收。
+                                </div>
+                                <div class="warning-box">
+                                    <strong>安全提醒：</strong>过量摄入某些矿物（如铁、锌）可能有副作用或毒性，需遵循UL上限。要防止重金属杂质，选择通过USP等质量认证的矿物产品。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>合成来源成分 (Synthetic Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>通过化学合成或人工手段制造的营养素或功能成分，易于大规模生产，纯度高、成本低，广泛用于各类膳食补充剂。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>维生素C（抗坏血酸）</h4>
+                                        <p>绝大部分维C补充剂采用工业合成的抗坏血酸，其分子与天然来源完全相同，是最普及的维生素补充剂之一。</p>
+                                        <span class="tag">经济实惠</span>
+                                        <span class="tag">高纯度</span>
+                                        <span class="tag">Vegan</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>叶酸 (Folic Acid)</h4>
+                                        <p>合成的叶酸是B9的形式，广泛用于孕产妇维生素和强化食品，预防新生儿神经管缺陷。</p>
+                                        <span class="tag">孕期必需</span>
+                                        <span class="tag">稳定性高</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素B12（氰钴胺）</h4>
+                                        <p>通常通过微生物发酵法合成获取，是素食者必须补充的维生素之一。价格低且效力高，被用于绝大多数复合维生素。</p>
+                                        <span class="tag">素食者必需</span>
+                                        <span class="tag">高效力</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>肌酸 (Creatine)</h4>
+                                        <p>健身领域常用的性能补剂，由氨基酸化合合成制造，可大量生产，用于增加肌肉力量和体积。</p>
+                                        <span class="tag">运动营养</span>
+                                        <span class="tag">纯度99%+</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>辅酶Q10</h4>
+                                        <p>通过发酵或合成手段获得，商业上多由微生物发酵生产。有助于细胞产能，常用于心血管保健、抗疲劳补充剂。</p>
+                                        <span class="tag">心脏健康</span>
+                                        <span class="tag">抗疲劳</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>消费者态度：</strong>高达91%的消费者表示不会购买明确标注"合成"字样的补充剂产品，对"合成成分"存在显著抗拒心理，但许多合成营养素在生物学效力上与天然版相同。
+                                </div>
+                                <div class="info-box">
+                                    <strong>转向天然趋势：</strong>近年来出现了"由合成转向天然"的动向，例如维生素D3从羊毛脂转向地衣提取，维生素K2从合成转向纳豆发酵获取，迎合消费者对清洁标签的需求。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>海洋来源成分 (Marine-derived Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>来源于海洋环境的动植物资源，包括海洋鱼类、甲壳类动物、海藻和海洋植物以及海洋矿物。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>深海鱼油 Omega-3</h4>
+                                        <p>鱼油是Omega-3脂肪酸EPA/DHA的重要来源，促进心脏、大脑、视力健康。高品质产品标注分子蒸馏提纯、无汞无重金属。</p>
+                                        <span class="tag">心脑健康</span>
+                                        <span class="tag">分子蒸馏</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>磷虾油 (Krill Oil)</h4>
+                                        <p>提取自南极磷虾，提供EPA/DHA且结合在磷脂上，富含天然抗氧化剂虾青素，体积小于鱼油胶囊且无腥味打嗝问题。</p>
+                                        <span class="tag">高吸收率</span>
+                                        <span class="tag">无腥味</span>
+                                        <span class="tag">MSC认证</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>海藻Omega-3 (Algal Oil)</h4>
+                                        <p>从特定海洋微藻中提取的Omega-3 DHA，这是纯素Omega-3的重要来源，适合孕期或不食用鱼类的人群。</p>
+                                        <span class="tag">Vegan</span>
+                                        <span class="tag">无污染风险</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>海带和碘 (Kelp/Iodine)</h4>
+                                        <p>海带等褐藻富含碘，是甲状腺制造甲状腺激素的关键元素。相比单纯碘化钾，海带提供"天然"概念且包含其他海洋矿物。</p>
+                                        <span class="tag">甲状腺支持</span>
+                                        <span class="tag">天然碘源</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>虾青素 (Astaxanthin)</h4>
+                                        <p>强力抗氧化剂，主要来自培养雨生红球藻的提取物。据称在眼睛健康、皮肤抗氧化、防晒和运动恢复等方面有益。</p>
+                                        <span class="tag">强抗氧化</span>
+                                        <span class="tag">天然藻源</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>可持续关注：</strong>消费者尤其是年轻一代愿意支持对环境负责的产品，许多海洋产品会标榜可持续渔业（MSC或"海之友"认证）。
+                                </div>
+                                <div class="warning-box">
+                                    <strong>安全提醒：</strong>海藻由于生长环境关系，可能富集重金属。例如部分海产褐藻被发现砷含量偏高，正规品牌通常会对海洋原料进行重金属检测。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>发酵来源成分 (Fermentation-derived Ingredients)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <p>通过微生物发酵工艺生产得到的功能成分，发酵过程能够产生独特的代谢物和提高生物活性，符合消费者对"天然"、"传统工艺"的美好想象。</p>
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>红曲米 (Red Yeast Rice)</h4>
+                                        <p>由红曲霉发酵大米制成，含有他汀类降胆固醇成分Monacolin K，被用作天然他汀替代，帮助降低血液胆固醇。</p>
+                                        <span class="tag">天然他汀</span>
+                                        <span class="tag">需检测毒素</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>纳豆激酶 (Nattokinase)</h4>
+                                        <p>从日本传统发酵食品纳豆中提取的蛋白酶，能够溶解血栓，用于支持心血管健康、防止血栓形成。</p>
+                                        <span class="tag">溶栓</span>
+                                        <span class="tag">心血管健康</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>发酵草本提取物</h4>
+                                        <p>如"发酵姜黄"、"发酵人参"等，将草药原料与特定益生菌共同发酵，据称提高草药有效成分的生物利用度。</p>
+                                        <span class="tag">高吸收</span>
+                                        <span class="tag">工艺创新</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>维生素K2 (MK-7)</h4>
+                                        <p>利用日本纳豆发酵菌或其他微生物发酵大豆或甜菜等基质，可以高效地产生MK-7，具备天然来源身份。</p>
+                                        <span class="tag">发酵提取</span>
+                                        <span class="tag">骨骼健康</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>氨基酸（发酵法）</h4>
+                                        <p>多数游离形式氨基酸补充剂采用微生物发酵法生产，如L-色氨酸、L-茶氨酸等，纯度高且为天然L-构型。</p>
+                                        <span class="tag">高纯度</span>
+                                        <span class="tag">非动物源</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <strong>市场趋势：</strong>"发酵"作为健康元素被消费者接受的程度在提高。后生元（Postbiotics）的概念也开始兴起，指发酵产生的失活菌体或代谢产物，同样具有调节免疫等健康作用。
+                                </div>
+                                <div class="warning-box">
+                                    <strong>质量控制：</strong>某些微生物发酵过程可能产生副产物或毒素，必须严格控制。例如红曲米不规范发酵时可能混入霉菌毒素，对肾脏有害。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按标签诉求细分 -->
+                <div id="labels" class="category-section">
+                    <div class="section-header">
+                        <h2>按标签诉求细分</h2>
+                        <p class="section-description">各种产品标签和认证反映了不同的消费者价值观和需求，从饮食限制到环保可持续等多个维度。</p>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>饮食相关标签 (Dietary-Related Labels)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Vegan（纯素）</h4>
+                                        <p>表示产品不含任何动物源成分，通常有独立的纯素认证标志。随着素食和纯素人群扩大，植物性保健品需求大增。</p>
+                                        <span class="tag">增长迅速</span>
+                                        <span class="tag">环保友好</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场数据：</strong>纯素补充剂市场预计将以约6.7%的年复合增长率增长，到2028年达到新的规模。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Gluten-Free（无麸质）</h4>
+                                        <p>FDA规定每份麸质含量低于20 ppm才能宣称无麸质。在保健品中非常常见，保障麸质敏感或乳糜泻患者可安全食用。</p>
+                                        <span class="tag">GFCO认证</span>
+                                        <span class="tag">高信任度</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场趋势：</strong>到2030年无麸质产品市场将保持约9%以上的年增长率，不仅麸质过敏者，一般消费者也将其视为"更健康"的象征。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Keto-Friendly（生酮友好）</h4>
+                                        <p>指产品符合生酮饮食要求，通常含碳水极低、富含脂肪或特定酮类成分。有Paleo Foundation等机构提供认证。</p>
+                                        <span class="tag">低碳水</span>
+                                        <span class="tag">减重支持</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Paleo（古法饮食友好）</h4>
+                                        <p>表示产品符合古饮食原则，不含谷物、豆类、精制糖和奶制品等。Paleo Foundation提供"Certified Paleo"认证。</p>
+                                        <span class="tag">天然少加工</span>
+                                        <span class="tag">洁净饮食</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Sugar-Free（无糖）</h4>
+                                        <p>每份糖含量少于0.5克，对于糖尿病患者、低碳水饮食人群特别重要。美国市场对于无糖产品的需求持续增长。</p>
+                                        <span class="tag">糖尿病友好</span>
+                                        <span class="tag">健康诉求</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Dairy-Free（无奶成分）</h4>
+                                        <p>表明产品不含乳制品及其衍生物，适用于乳糖不耐受人群、对奶制品过敏者以及严格的素食/纯素者。</p>
+                                        <span class="tag">无过敏原</span>
+                                        <span class="tag">乳糖不耐友好</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Soy-Free（无大豆）</h4>
+                                        <p>标明产品未使用大豆或其衍生物，对于大豆过敏者、甲状腺疾病患者或担心转基因大豆的人群很重要。</p>
+                                        <span class="tag">无过敏原</span>
+                                        <span class="tag">甲状腺友好</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>生产和品质标签 (Production & Quality Labels)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Organic (USDA Organic)</h4>
+                                        <p>符合有机农业标准，未使用合成农药、化肥或转基因成分，需95%以上成分为有机才能标USDA Organic徽章。</p>
+                                        <span class="tag">环保可持续</span>
+                                        <span class="tag">高品质</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场数据：</strong>2023年有机产品销售额达700亿美元创新高，并连续多年保持两位数增长。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Non-GMO（非转基因）</h4>
+                                        <p>通过Non-GMO Project Verified第三方验证，包装上印有橙色蝴蝶标志。超过50%的膳食补充剂消费者会特别留意此标签。</p>
+                                        <span class="tag">Non-GMO Project</span>
+                                        <span class="tag">高信任度</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Third-Party Tested（第三方检测）</h4>
+                                        <p>经过独立实验室的检测验证，针对有效含量、纯度及有无有害物质等方面。是影响购买意向的关键因素之一。</p>
+                                        <span class="tag">质量保证</span>
+                                        <span class="tag">透明度高</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>GMP Certified（GMP认证）</h4>
+                                        <p>良好生产规范认证，美国法规要求所有膳食补充剂需在符合GMP的设施中生产，是产品安全和质量的基础保障。</p>
+                                        <span class="tag">生产规范</span>
+                                        <span class="tag">安全保障</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Clean Label（洁净标签）</h4>
+                                        <p>产品配方简单、添加物少、成分天然透明。体现为不含人工色素、香料、防腐剂，不含填充剂或改用天然替代品。</p>
+                                        <span class="tag">天然成分</span>
+                                        <span class="tag">无人工添加</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Made in USA（美国制造）</h4>
+                                        <p>产地标签在保健品中极为常见，意味着符合FDA cGMP监管、运输过程短、信誉保障，许多消费者倾向选择。</p>
+                                        <span class="tag">本土生产</span>
+                                        <span class="tag">质量保障</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>功能强度标签 (Functional Potency & Efficacy Labels)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Clinically Proven（临床证明）</h4>
+                                        <p>产品或其成分已通过临床试验证实功效。研究显示此标签可使消费者购买意愿提高近一倍，愿意多支付约20%。</p>
+                                        <span class="tag">科学支持</span>
+                                        <span class="tag">高可信度</span>
+                                        <div class="warning-box" style="margin-top: 10px;">
+                                            <strong>监管要求：</strong>FTC和FDA近年加强了对这类声称的监管，要求证据充分且表述不夸大。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>High Potency（高含量/高效）</h4>
+                                        <p>根据FDA规定，当单种维生素或矿物质每份含量达到或超过每日参考值的100%时，可称其为"High Potency"。</p>
+                                        <span class="tag">高剂量</span>
+                                        <span class="tag">强效配方</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Extra Strength（加强版）</h4>
+                                        <p>营销用语表示剂量或功效比标准版本更强，通常意味着比普通配方含有更多的主要有效成分。</p>
+                                        <span class="tag">高剂量</span>
+                                        <span class="tag">升级配方</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Doctor Recommended（医生推荐）</h4>
+                                        <p>有医疗专业人士对产品的推荐背书，提升了信任度，尤其针对维生素、关节健康等传统医疗相关的补充剂。</p>
+                                        <span class="tag">权威背书</span>
+                                        <span class="tag">专业认可</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Time-Release（缓释/分时释放）</h4>
+                                        <p>采用特殊剂型或配方，可使有效成分在体内缓慢释放、延长作用时间，减少副作用。</p>
+                                        <span class="tag">持续释放</span>
+                                        <span class="tag">减少刺激</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Clinically Studied Ingredient（临床研究配方）</h4>
+                                        <p>品牌宣传"含有经过临床研究证明有效的成分"，表明产品配方有科学依据支撑，比纯粹的功能宣称更可信。</p>
+                                        <span class="tag">科学配方</span>
+                                        <span class="tag">研究支持</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>宗教与文化标签 (Religious & Cultural Labels)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Halal（清真）</h4>
+                                        <p>符合伊斯兰教教规，可供穆斯林食用。原料中不含猪源或酒精等禁忌成分，通过权威清真认证机构审核。</p>
+                                        <span class="tag">20亿市场</span>
+                                        <span class="tag">国际化必备</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>市场价值：</strong>取得Halal认证可触达全球超过20亿穆斯林消费者，企业视其为打开国际市场的钥匙。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Kosher（犹太洁食）</h4>
+                                        <p>符合犹太教饮食规戒，需通过犹太洁食认证机构审核。许多消费者将Kosher视为高纯度、高质量的象征。</p>
+                                        <span class="tag">高品质象征</span>
+                                        <span class="tag">严格工艺</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Cruelty-Free（无虐待动物）</h4>
+                                        <p>产品及其成分未经动物实验，并不含动物源材料。迎合了注重动物权益的消费群体，尤其是年轻一代。</p>
+                                        <span class="tag">伦理消费</span>
+                                        <span class="tag">年轻市场</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>可持续/环保标签 (Sustainability & Eco-Friendly Labels)</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>Sustainably Sourced（可持续采购）</h4>
+                                        <p>原料的获取过程注重环境和社会责任，如鱼油来自可持续渔业（MSC认证），草本原料来自可持续农场。</p>
+                                        <span class="tag">环保责任</span>
+                                        <span class="tag">社会责任</span>
+                                        <div class="info-box" style="margin-top: 10px;">
+                                            <strong>消费趋势：</strong>消费者尤其是年轻一代愿意支持对环境负责的产品，可持续宣称产品的销售增长显著。
+                                        </div>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Eco-Friendly Packaging（环保包装）</h4>
+                                        <p>使用可回收材料、可生物降解材料，或减少过度包装。消费者环保意识提高后，对包装也有所关注。</p>
+                                        <span class="tag">可回收</span>
+                                        <span class="tag">减少浪费</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Carbon Neutral（碳中和）</h4>
+                                        <p>品牌宣布其产品生产实现了碳中和，体现从原料采购、生产到运输的全流程都平衡了碳排放。</p>
+                                        <span class="tag">气候友好</span>
+                                        <span class="tag">环保投入</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Plastic-Free（无塑料）</h4>
+                                        <p>产品包装完全不含塑料成分，迎合了零浪费（Zero Waste）社群的需求，虽然目前占有率不高但具有增长趋势。</p>
+                                        <span class="tag">零浪费</span>
+                                        <span class="tag">创新包装</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Fair Trade（公平贸易）</h4>
+                                        <p>表示原料在贸易中确保农民公平收益，常用于茶类、植物提取物等原料型补剂，体现社会责任。</p>
+                                        <span class="tag">公平收益</span>
+                                        <span class="tag">社会责任</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>B Corp认证</h4>
+                                        <p>表示公司整体在社会责任和环境方面表现卓越，一些保健品公司取得了B Corp认证并以此提升品牌形象。</p>
+                                        <span class="tag">企业责任</span>
+                                        <span class="tag">综合认证</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subcategory">
+                        <div class="subcategory-header" onclick="toggleSubcategory(this)">
+                            <h3>其它常见/增长中的标签类型</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subcategory-content">
+                            <div class="subcategory-inner">
+                                <div class="component-list">
+                                    <div class="component-item">
+                                        <h4>All Natural（纯天然）</h4>
+                                        <p>历史悠久的营销标签，意指产品未含人工合成的成分。虽然FDA并无严格定义，但在消费者心目中仍意味着更安全健康。</p>
+                                        <span class="tag">传统标签</span>
+                                        <span class="tag">消费者认知</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>NSF Certified for Sport / Informed-Choice</h4>
+                                        <p>针对运动营养补剂的重要认证，确保产品不含运动禁用药物成分，适合职业运动员使用。</p>
+                                        <span class="tag">运动安全</span>
+                                        <span class="tag">反兴奋剂</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>USP Verified（USP药典验证）</h4>
+                                        <p>由美国药典委员会提供的自愿验证项目，成分含量、纯度、溶出等达到USP的严格标准，是权威质量背书。</p>
+                                        <span class="tag">药典标准</span>
+                                        <span class="tag">权威认证</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Adaptogen（自适应原）</h4>
+                                        <p>标明产品含有如灵芝、人参等可帮助身体适应压力的草药，迎合了现代人的压力管理需求。</p>
+                                        <span class="tag">压力管理</span>
+                                        <span class="tag">新兴概念</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Glyphosate Residue Free（无草甘膦残留）</h4>
+                                        <p>一些追求极致纯净品牌的新卖点，通过第三方检测证明原料无农药残留，满足对安全的极致追求。</p>
+                                        <span class="tag">极致纯净</span>
+                                        <span class="tag">安全保障</span>
+                                    </div>
+                                    <div class="component-item">
+                                        <h4>Keto + Paleo + Vegan组合标签</h4>
+                                        <p>用于宣称产品同时符合多种流行饮食标准，满足更广泛人群，体现产品的包容性和适用性。</p>
+                                        <span class="tag">多标准兼容</span>
+                                        <span class="tag">广泛适用</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 搜索功能
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const allContent = document.querySelectorAll('.subcategory-inner p, .component-item h4, .component-item p, .subsection-title');
+            
+            allContent.forEach(element => {
+                const text = element.textContent.toLowerCase();
+                if (searchTerm && text.includes(searchTerm)) {
+                    element.innerHTML = element.textContent.replace(
+                        new RegExp(searchTerm, 'gi'),
+                        match => `<span class="highlight">${match}</span>`
+                    );
+                } else {
+                    element.innerHTML = element.textContent;
+                }
+            });
+
+            // 如果有搜索词，自动展开包含搜索结果的分类
+            if (searchTerm) {
+                const highlighted = document.querySelectorAll('.highlight');
+                highlighted.forEach(item => {
+                    const subcategory = item.closest('.subcategory');
+                    if (subcategory) {
+                        subcategory.classList.add('expanded');
+                    }
+                });
+            }
+        });
+
+        // 显示指定分类
+        function showSection(sectionId) {
+            // 隐藏所有分类
+            document.querySelectorAll('.category-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 显示指定分类
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 更新导航状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 清除搜索高亮
+            document.getElementById('searchBox').value = '';
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.outerHTML = el.textContent;
+            });
+        }
+
+        // 切换子分类展开/折叠
+        function toggleSubcategory(header) {
+            const subcategory = header.closest('.subcategory');
+            subcategory.classList.toggle('expanded');
+        }
+
+        // 初始化：展开第一个子分类
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSubcategory = document.querySelector('.subcategory');
+            if (firstSubcategory) {
+                firstSubcategory.classList.add('expanded');
+            }
+        });
+
+        // 平滑滚动到顶部功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 添加回到顶部按钮
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            let backToTopButton = document.getElementById('backToTop');
+            
+            if (!backToTopButton) {
+                backToTopButton = document.createElement('button');
+                backToTopButton.id = 'backToTop';
+                backToTopButton.innerHTML = '↑';
+                backToTopButton.style.cssText = `
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    border: none;
+                    font-size: 20px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    transition: all 0.3s ease;
+                    z-index: 1000;
+                    display: none;
+                `;
+                backToTopButton.onclick = scrollToTop;
+                document.body.appendChild(backToTopButton);
+            }
+            
+            if (scrollTop > 300) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        // 添加键盘快捷键支持
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + F 聚焦搜索框
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchBox').focus();
+            }
+            
+            // ESC 清除搜索
+            if (e.key === 'Escape') {
+                document.getElementById('searchBox').value = '';
+                document.getElementById('searchBox').dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
+</body>
