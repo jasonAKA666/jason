@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保健品产品清单分类与机会分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边导航栏 */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: #333;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .search-box {
+            margin: 0 1rem 1.5rem;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+            border-left-color: #ffd700;
+            transform: translateX(5px);
+        }
+
+        .nav-link .icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 0.5rem;
+            text-align: center;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 2rem;
+            background: white;
+            min-height: 100vh;
+            border-radius: 20px 0 0 0;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .content-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .content-card h3::before {
+            content: "📊";
+            margin-right: 0.5rem;
+        }
+
+        .content-card h4 {
+            color: #764ba2;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+
+        .tag.high-opportunity {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .tag.medium-opportunity {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .tag.competitive {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        /* 高亮框 */
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .tip-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .opportunity-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        /* 筛选器 */
+        .filter-container {
+            background: #f8f9ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .filter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        /* 产品列表 */
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .product-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边导航栏 -->
+        <aside class="sidebar">
+            <h1>保健品产品分析</h1>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索产品或关键词...">
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" data-section="overview">
+                            <span class="icon">📈</span>概述与统计
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="function">
+                            <span class="icon">⚡</span>按功效分类
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="target">
+                            <span class="icon">👥</span>按目标人群分类
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="system">
+                            <span class="icon">🫀</span>按生理系统分类
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="ingredient">
+                            <span class="icon">🌿</span>按成分来源分类
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="dosage">
+                            <span class="icon">💊</span>按剂型分类
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="opportunity">
+                            <span class="icon">🚀</span>机会分析
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 概述与统计 -->
+            <section id="overview" class="content-section active">
+                <div class="section-header">
+                    <h2>保健品产品清单分类与机会分析</h2>
+                    <p>全面解析保健品市场机会与产品分类</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>20+</h4>
+                        <p>核心产品品类</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>9</h4>
+                        <p>功效分类</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>8</h4>
+                        <p>目标人群</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>5</h4>
+                        <p>高机会领域</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>分析框架</h3>
+                    <p>本报告从多个维度对保健品产品进行了系统性分类分析，包括功效分类、目标人群、生理系统、成分来源、剂型等。通过对市场数据的深入挖掘，识别出具有高增长潜力的机会领域。</p>
+                    
+                    <div class="highlight-box">
+                        <h4>核心发现</h4>
+                        <ul>
+                            <li>运动营养与体重管理领域机会最多，市场增长强劲</li>
+                            <li>免疫支持与天然抗菌类产品在后疫情时代需求旺盛</li>
+                            <li>抗衰老与认知功能领域技术创新活跃，新品层出不穷</li>
+                            <li>软糖、即食等新剂型大幅降低保健品使用门槛</li>
+                            <li>植物基、有机认证等成分来源差异化趋势明显</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>市场机会总结</h3>
+                    <div class="opportunity-box">
+                        <h4>🚀 高机会领域特征</h4>
+                        <ul>
+                            <li><strong>需求真实且增长：</strong>对应的健康需求广泛存在并呈上升趋势</li>
+                            <li><strong>竞争格局未定：</strong>品牌集中度低于50%，新进入者有机会</li>
+                            <li><strong>产品创新驱动：</strong>配方或形式创新满足未被满足的用户需求</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 按功效分类 -->
+            <section id="function" class="content-section">
+                <div class="section-header">
+                    <h2>按功效（功能）分类</h2>
+                    <p>根据产品主要宣称的健康功效进行分类</p>
+                </div>
+
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label>筛选功效：</label>
+                        <select id="functionFilter">
+                            <option value="">全部功效</option>
+                            <option value="助眠放松">助眠放松</option>
+                            <option value="增强免疫">增强免疫</option>
+                            <option value="肠胃消化">肠胃消化</option>
+                            <option value="排毒清洁">排毒清洁</option>
+                            <option value="运动健身">运动健身</option>
+                            <option value="体重管理">体重管理</option>
+                            <option value="认知大脑">认知大脑</option>
+                            <option value="抗衰老">抗衰老</option>
+                            <option value="呼吸健康">呼吸健康</option>
+                            <option value="女性健康">女性健康</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <table class="data-table" id="functionTable">
+                        <thead>
+                            <tr>
+                                <th>功效类别</th>
+                                <th>对应产品（示例）</th>
+                                <th>市场机会</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-category="助眠放松">
+                                <td><strong>助眠放松</strong><br><small>改善睡眠、缓解压力</small></td>
+                                <td>液态镁、甘氨酸镁粉末等镁补充剂（镇静神经助眠）；部分草本产品如南非醉茄（常见于配方）亦有助放松效果。</td>
+                                <td><span class="tag medium-opportunity">中等机会</span></td>
+                            </tr>
+                            <tr data-category="增强免疫">
+                                <td><strong>增强免疫</strong><br><small>提高免疫力、抗感染</small></td>
+                                <td>辣木胶囊（"天然复合维生素"，补充营养增强免疫）；初乳（富含免疫因子，增强成人和儿童抵抗力）；牛至油与黑籽油（天然抗菌抗病毒，用于呼吸道感染等）；蘑菇软糖/蘑菇咖啡（药用蘑菇如灵芝、虫草等提高免疫）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="肠胃消化">
+                                <td><strong>肠胃消化</strong><br><small>助消化、护肠道</small></td>
+                                <td>消化酶、木瓜酶咀嚼片（含消化酶，缓解餐后消化不良）；初乳（修复肠黏膜，改善肠漏和肠易激综合征）；牛至油与黑籽油（针对肠道菌群失调如念珠菌过度生长）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="排毒清洁">
+                                <td><strong>排毒清洁</strong><br><small>体内排毒、清除有害物质</small></td>
+                                <td>沸石排毒（火山矿物沸石吸附重金属毒素）；牛至油与黑籽油（辅助驱除寄生虫、清除有害菌）；辣木胶囊（抗氧化抗炎，减轻慢性炎症）；肺部用毛蕊花滴剂/软糖（清肺化痰，被视作肺部"排毒"）。</td>
+                                <td><span class="tag medium-opportunity">中等机会</span></td>
+                            </tr>
+                            <tr data-category="运动健身">
+                                <td><strong>运动健身</strong><br><small>提高运动表现、肌肉恢复</small></td>
+                                <td>液态镁（运动人群补充镁缓解抽筋、加速肌肉恢复）；肌酸软糖（提升肌肉力量，软糖形式方便健身新手补充）；蛋白棒、蛋白质薯片（高蛋白营养补充，促进肌肉合成）；氢水片剂（运动后抗氧化减轻肌肉酸痛）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="体重管理">
+                                <td><strong>体重管理</strong><br><small>减脂控重、增加饱腹</small></td>
+                                <td>减肥饮料混合物（冲调饮料增加饱腹感，帮助节食者控制食欲）；卡宴辣椒滴剂（通过辣椒素提高代谢、助燃脂）；高蛋白零食如蛋白棒和蛋白质薯片（替代高热量零食，增肌减脂两相宜）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="认知大脑">
+                                <td><strong>认知大脑</strong><br><small>提高认知、抗脑雾</small></td>
+                                <td>亚甲蓝（作为线粒体增强剂和促智剂，提高专注记忆）；蘑菇咖啡（含狮鬃菇等助益认知的药用菇，提高精神专注）；NAD补充剂及NAD+白藜芦醇（提升细胞能量代谢，改善脑功能）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="抗衰老">
+                                <td><strong>抗衰老</strong><br><small>细胞养护、延缓衰老</small></td>
+                                <td>NAD补充剂（中年群体为延缓衰老提升NAD+水平）；NAD+白藜芦醇（结合多种抗衰成分，受长寿领域新知推动）；亚甲蓝（保护线粒体对抗年龄相关衰退）；辣木胶囊（富含抗氧化剂，对抗自由基延缓衰老）。</td>
+                                <td><span class="tag high-opportunity">高机会</span></td>
+                            </tr>
+                            <tr data-category="呼吸健康">
+                                <td><strong>呼吸健康</strong><br><small>润肺护肺、缓解咳嗽</small></td>
+                                <td>肺部用毛蕊花滴剂（毛蕊花草本滴剂化痰、舒缓气道不适）；毛蕊花软糖（以软糖形式摄入毛蕊花，功效同上，口味更佳）；牛至油与黑籽油（用于呼吸道感染如鼻窦炎、支气管炎的辅助疗法）。</td>
+                                <td><span class="tag medium-opportunity">中等机会</span></td>
+                            </tr>
+                            <tr data-category="女性健康">
+                                <td><strong>女性健康</strong><br><small>更年期管理、美容等</small></td>
+                                <td>女性更年期补充剂（专注于缓解围绝经期女性的潮热、情绪波动等）；初乳（富含生长因子，有人用于美容抗衰）；其他如胶原蛋白类产品（未列出但属于美容功效）。</td>
+                                <td><span class="tag medium-opportunity">中等机会</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 分类说明</h4>
+                    <p>单一产品往往具备多重功效，上表按主要功效分类，但部分产品可归属于多个类别。如初乳既可增强免疫又促进肠道和运动恢复；液态镁既有助眠又用于运动肌肉恢复等。</p>
+                </div>
+            </section>
+
+            <!-- 按目标人群分类 -->
+            <section id="target" class="content-section">
+                <div class="section-header">
+                    <h2>按目标人群分类</h2>
+                    <p>按照产品瞄准的主要消费人群特征进行分类</p>
+                </div>
+
+                <div class="content-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>目标人群类别</th>
+                                <th>对应产品（示例）</th>
+                                <th>人群特征</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>运动健身人群</strong><br><small>健身爱好者、运动员</small></td>
+                                <td>液态镁（健身者补镁防抽筋）、肌酸软糖（健身新手以软糖形式补肌酸）、蛋白棒/蛋白质薯片（健身人士补充蛋白/代餐）、氢水片剂（运动后恢复）、初乳（高强度训练者提高免疫和修复肠道）</td>
+                                <td><span class="tag high-opportunity">高消费力</span><span class="tag">注重体能恢复</span><span class="tag">追求肌肉增长</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>减肥瘦身人群</strong><br><small>节食者、控重人群</small></td>
+                                <td>减肥饮料混合物（节食者控制食欲）、卡宴辣椒滴剂（追求提高代谢的减重人群，将其视为"燃脂加速器"）、高蛋白零食（蛋白棒/薯片帮助增饱腹感、替代高热量零食）</td>
+                                <td><span class="tag">注重低卡饱腹</span><span class="tag">追求代谢提升</span><span class="tag medium-opportunity">中等消费力</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>中老年人</strong><br><small>关注抗衰与慢病预防</small></td>
+                                <td>NAD补充剂（富裕中老年人为延缓衰老补充NAD+）、NAD+白藜芦醇（深度抗衰老实践者受科研前沿推动）、氢水片剂（中老年群体希望借抗氧化延缓慢性疾病）、初乳（中老年希望提高免疫力）</td>
+                                <td><span class="tag high-opportunity">高消费力</span><span class="tag">注重细胞级养护</span><span class="tag">追求整体活力</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>女性人群</strong><br><small>尤其更年期及美容需求</small></td>
+                                <td>女性更年期补充剂（聚焦更年期女性，缓解更年期症状）；初乳等抗衰产品也吸引中老年女性；含美容功效成分（胶原蛋白、维生素C等）的产品面向爱美女性</td>
+                                <td><span class="tag">关注激素平衡</span><span class="tag">注重美容抗衰</span><span class="tag medium-opportunity">中等消费力</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>消化不良人群</strong><br><small>肠胃敏感者</small></td>
+                                <td>消化酶（经常消化不良、餐后不适者）、木瓜酶咀嚼片（偶发性轻度消化不良人群，将其当作"大餐后"的助消化糖）</td>
+                                <td><span class="tag">寻求快速缓解</span><span class="tag">偏好温和安全</span><span class="tag">注重便利性</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>免疫提升人群</strong><br><small>易感染、亚健康者</small></td>
+                                <td>辣木胶囊（健康爱好者作为日常综合营养补充）、牛至油与黑籽油（有顽固感染或免疫问题者）、初乳（体弱多病者或儿童想增强抵抗力）、蘑菇软糖/咖啡（一般保健新手好奇药用菇提高免疫）</td>
+                                <td><span class="tag">希望天然补充</span><span class="tag">加强免疫防御</span><span class="tag">偏好安全成分</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>压力大/睡眠差人群</strong><br><small>职场高压、失眠者</small></td>
+                                <td>甘氨酸镁粉末（核心用户是睡眠不佳、焦虑紧张人群，睡前服用助眠）；液态镁（高压力人士帮助放松神经、改善睡眠）；某些适应原如南非醉茄、灵芝孢子等</td>
+                                <td><span class="tag">寻求缓解压力</span><span class="tag">改善睡眠质量</span><span class="tag">追求天然方案</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>生物黑客与早期采纳者</strong><br><small>前沿保健探索者</small></td>
+                                <td>亚甲蓝（Biohacker群体将其视为线粒体功能优化工具）、NAD+白藜芦醇（受大卫·辛克莱等前沿科研影响的抗衰先锋）、氢水片剂（喜欢尝试新兴健康科技产品）</td>
+                                <td><span class="tag high-opportunity">高消费力</span><span class="tag">乐于尝试新品</span><span class="tag">追求身体优化</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>呼吸系统需求人群</strong><br><small>呼吸不适、空气污染暴露者</small></td>
+                                <td>肺部用毛蕊花滴剂（感冒、过敏导致的咳嗽痰多者）、毛蕊花软糖（不喜欢滴剂味道的消费者改用软糖）；吸烟者/空气污染下生活者（使用毛蕊花草本来净化肺部）</td>
+                                <td><span class="tag">因环境导致肺部不适</span><span class="tag">寻求天然草本方案</span><span class="tag">注重呼吸清洁</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 人群交叉重叠</h4>
+                    <p>以上分类基于产品定位的核心用户群。许多产品的目标人群有交叉重叠，例如运动健身人群和减肥人群都可能消费高蛋白零食，中老年人与女性更年期人群在抗衰需求上也有重合。</p>
+                </div>
+            </section>
+
+            <!-- 按生理系统分类 -->
+            <section id="system" class="content-section">
+                <div class="section-header">
+                    <h2>按生理系统分类</h2>
+                    <p>按照产品主要作用的身体系统或部位进行分类</p>
+                </div>
+
+                <div class="content-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>生理系统</th>
+                                <th>相关产品</th>
+                                <th>主要作用机制</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>神经系统</strong><br><small>大脑&睡眠</small></td>
+                                <td>亚甲蓝（提升线粒体能量，改善认知与精神状态）、甘氨酸镁粉末/液态镁（镇静神经助眠）、NAD系列（支持神经细胞能量代谢）、蘑菇咖啡（含益智药用蘑菇，提高认知）</td>
+                                <td><span class="tag">线粒体增强</span><span class="tag">神经镇静</span><span class="tag">认知提升</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>免疫系统</strong><br><small>抵抗力&感染防护</small></td>
+                                <td>初乳（富含免疫球蛋白，全面增强免疫）、辣木胶囊（抗氧化营养素提高免疫）、牛至油与黑籽油（抗菌抗病毒，帮助免疫系统对抗感染）、蘑菇软糖/咖啡（药用菇多糖增强免疫）</td>
+                                <td><span class="tag">免疫球蛋白</span><span class="tag">抗氧化</span><span class="tag">天然抗菌</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>消化系统</strong><br><small>肠胃&消化</small></td>
+                                <td>消化酶、木瓜酶（直接提供酶促进食物分解）、初乳（修复肠道黏膜，改善肠道通透性）、牛至油与黑籽油（平衡肠道菌群，缓解肠道感染）、卡宴辣椒滴剂（刺激消化液分泌和肠胃蠕动）</td>
+                                <td><span class="tag">酶促消化</span><span class="tag">肠道修复</span><span class="tag">菌群平衡</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>呼吸系统</strong><br><small>肺部&气道</small></td>
+                                <td>肺部用毛蕊花滴剂/软糖（润肺、镇咳平喘）、牛至油（天然挥发油可辅助呼吸道清洁）、黑籽油（民间用于缓解哮喘咳嗽）</td>
+                                <td><span class="tag">润肺化痰</span><span class="tag">气道清洁</span><span class="tag">炎症缓解</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>内分泌系统</strong><br><small>激素&代谢</small></td>
+                                <td>女性更年期补充剂（调节雌激素平衡，缓解更年期症状）、NAD补充剂（间接影响胰岛素敏感性等代谢激素）、辣木（有助调节血糖平衡，从而影响胰岛功能）、减肥饮料混合物（通过纤维等作用于饥饿激素控制食欲）</td>
+                                <td><span class="tag">激素平衡</span><span class="tag">代谢调节</span><span class="tag">血糖控制</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>肌肉骨骼系统</strong><br><small>肌肉&骨骼</small></td>
+                                <td>肌酸软糖（促进肌肉能量和力量）、蛋白棒/薯片（提供肌肉合成所需氨基酸）、液态镁（预防肌肉痉挛）、初乳（生长因子有助组织修复和骨骼健康）</td>
+                                <td><span class="tag">肌肉能量</span><span class="tag">蛋白合成</span><span class="tag">组织修复</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>心血管系统</strong><br><small>心脏&血管</small></td>
+                                <td>液态镁（有助维持心脏和血管健康，防止腿抽筋）、白藜芦醇（抗氧化保护心血管）、黑籽油（研究表明其有助改善血脂）、辣木（降血脂血糖，保护心脏）</td>
+                                <td><span class="tag">心血管保护</span><span class="tag">抗氧化</span><span class="tag">血脂调节</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>全身/细胞代谢</strong><br><small>细胞&代谢</small></td>
+                                <td>NAD及亚甲蓝（作用于全身细胞的线粒体功能）、氢水片剂（全身抗氧化抗炎）、沸石排毒（全身性排毒清理重金属）、辣木（全面营养支持多系统）、初乳（细胞生长修复）</td>
+                                <td><span class="tag">线粒体功能</span><span class="tag">抗氧化抗炎</span><span class="tag">全身排毒</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ 系统交叉影响</h4>
+                    <p>某些产品影响多个系统，如NAD补充剂同时支持神经、代谢和心血管健康；辣木因其全面营养对多系统都有益处。本分类按主要影响的系统列出，每款产品可能出现在多个类别中。</p>
+                </div>
+            </section>
+
+            <!-- 按成分来源分类 -->
+            <section id="ingredient" class="content-section">
+                <div class="section-header">
+                    <h2>按成分来源分类</h2>
+                    <p>按照产品的主要成分性质进行分类</p>
+                </div>
+
+                <div class="content-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>成分来源类别</th>
+                                <th>包含产品</th>
+                                <th>成分特点</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>维生素与矿物质</strong><br><small>微量营养素类</small></td>
+                                <td>液态镁、甘氨酸镁粉末（矿物质镁补充）；NAD补充剂（烟酰胺核苷等维生素B3衍生物）；NAD+白藜芦醇（白藜芦醇虽来自植物但常与维生素类组合）；氢水片剂（通过金属镁产生氢气，同时补充镁元素）</td>
+                                <td><span class="tag">人体必需</span><span class="tag">易吸收</span><span class="tag">基础营养</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>植物提取物</strong><br><small>草本和真菌</small></td>
+                                <td>辣木胶囊（提取自辣木树叶粉）；沸石排毒（虽然沸石是矿物，但常归为自然提取物）；牛至油与黑籽油（提取自牛至叶和黑种草籽的油脂）；卡宴辣椒滴剂（来自辣椒提取物辣椒素）；肺部毛蕊花滴剂/软糖（毛蕊花草本提取）；蘑菇软糖/咖啡（真菌提取物，如狮鬃菇、灵芝等）</td>
+                                <td><span class="tag high-opportunity">天然来源</span><span class="tag">传统应用</span><span class="tag">活性丰富</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>氨基酸及运动补剂</strong><br><small>蛋白质相关</small></td>
+                                <td>肌酸软糖（含肌酸，一种氨基酸衍生物，用于增强肌肉）；部分镁产品中含甘氨酸（氨基酸，用于螯合镁）；蛋白棒/薯片（富含氨基酸组成的蛋白质）；亚甲蓝配方中添加的N-乙酰半胱氨酸等氨基酸</td>
+                                <td><span class="tag">运动专用</span><span class="tag">肌肉构建</span><span class="tag">恢复促进</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>酶和益生元</strong><br><small>消化辅助</small></td>
+                                <td>消化酶（包含胰酶、淀粉酶等多种酶制剂）、木瓜酶咀嚼片（木瓜蛋白酶，源自植物）；一些配方中添加了菠萝蛋白酶、益生元纤维等。清单中暂未出现活的益生菌制剂，但有益生元成分</td>
+                                <td><span class="tag">生物活性</span><span class="tag">消化促进</span><span class="tag">肠道友好</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>动物提取物</strong><br><small>动物源成分</small></td>
+                                <td>初乳（牛初乳，源自奶牛分娩后初奶）；蛋白棒/薯片若含乳清蛋白则源自奶类；某些配方含胶原蛋白（通常来自鱼或牛）。动物来源成分在本清单中相对较少，初乳是典型代表</td>
+                                <td><span class="tag">生物活性高</span><span class="tag">免疫因子</span><span class="tag">生长因子</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>合成物质</strong><br><small>人工制备</small></td>
+                                <td>亚甲蓝（合成的化合物，最初作为药物染料）、氢水片剂（通过化学反应释放氢气，一种气体抗氧化剂）。此类产品的有效成分并非直接来自天然食物植物，而是人工制备或特殊形式存在</td>
+                                <td><span class="tag">精确剂量</span><span class="tag">稳定性强</span><span class="tag">创新成分</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tip-box">
+                    <h4>💡 复合配方说明</h4>
+                    <p>许多产品是复合配方，含有多种来源的成分。例如甘氨酸镁粉末不仅提供镁元素，还常添加维生素B族、草本适应原等；NAD+白藜芦醇同时含合成的烟酰胺核苷和植物提取的白藜芦醇。因此按成分来源分类时，一个产品可能属多类别，这里按主要成分归类。</p>
+                </div>
+            </section>
+
+            <!-- 按剂型分类 -->
+            <section id="dosage" class="content-section">
+                <div class="section-header">
+                    <h2>按剂型（形式）分类</h2>
+                    <p>依据产品提供给消费者的剂型或服用形式进行分类</p>
+                </div>
+
+                <div class="content-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>剂型类别</th>
+                                <th>对应产品</th>
+                                <th>剂型优势</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>液体剂型</strong><br><small>液体滴剂、酊剂等</small></td>
+                                <td>液态镁（液体滴剂形式服用）、肺部用毛蕊花滴剂（草药酊剂滴服）、卡宴辣椒滴剂（液体辣椒酊剂）、牛至油滴剂（精油滴剂服用）</td>
+                                <td><span class="tag high-opportunity">快速吸收</span><span class="tag">剂量灵活</span><span class="tag">适合吞咽困难者</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>胶囊/软胶囊</strong><br><small>传统剂型</small></td>
+                                <td>辣木胶囊（植物胶囊）、消化酶（常见胶囊形式）、NAD补充剂（胶囊/软胶囊皆有）、女性更年期补充剂（胶囊最常见），以及大多数传统营养素（镁粉末也可装入胶囊服用）</td>
+                                <td><span class="tag">剂量标准</span><span class="tag">稳定性好</span><span class="tag">便于保存</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>片剂</strong><br><small>含片、咀嚼片</small></td>
+                                <td>木瓜酶咀嚼片（酶制剂做成咀嚼片）、氢水片剂（泡腾片，溶于水饮用）、部分亚甲蓝产品（制成含片剂型）、甘氨酸镁粉末有时也提供片剂形式</td>
+                                <td><span class="tag">便于携带</span><span class="tag">可做缓释</span><span class="tag">口感改善</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>粉剂</strong><br><small>冲调粉末</small></td>
+                                <td>甘氨酸镁粉末（主打粉末冲调）、减肥饮料混合物（粉末冲饮）、蘑菇咖啡（蘑菇提取物与咖啡粉的即溶混合）、消化酶粉剂（有些酶制剂提供粉末冲剂）、初乳粉（常见包装形式）</td>
+                                <td><span class="tag">剂量灵活</span><span class="tag">易于调配</span><span class="tag">成本相对低</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>软糖/咀嚼糖</strong><br><small>创新剂型</small></td>
+                                <td>蘑菇软糖（将药用菇做成软糖，改善口感方便食用）、毛蕊花软糖（取代滴剂口感更佳）、肌酸软糖（比粉末更易坚持）、女性更年期软糖（市面亦有软糖形式）、NAD软糖（部分品牌将NAD前体做成软糖）</td>
+                                <td><span class="tag high-opportunity">口感友好</span><span class="tag">降低使用门槛</span><span class="tag">吸引年轻用户</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>即食食品</strong><br><small>功能零食、饮品</small></td>
+                                <td>蛋白棒（高蛋白能量棒）、蛋白质薯片（高蛋白脆片零食）、蘑菇咖啡（即饮功能咖啡）、初乳奶昔（有初乳添加的冲饮）等</td>
+                                <td><span class="tag high-opportunity">日常化</span><span class="tag">接受度高</span><span class="tag">体验感强</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="opportunity-box">
+                    <h4>🚀 剂型创新机会</h4>
+                    <p>不少产品有多种剂型选择。剂型创新往往意味着新的市场切入点，如肌酸软糖就是将原本的粉剂创新为软糖，从而吸引了因粉末口感不佳而犹豫的用户。软糖、即食功能性食品等新剂型具有更高的接受度和体验感，将保健功能融入日常零食和食品形态，迎合"不想吃药"的消费偏好。</p>
+                </div>
+            </section>
+
+            <!-- 机会分析 -->
+            <section id="opportunity" class="content-section">
+                <div class="section-header">
+                    <h2>机会细分领域分析</h2>
+                    <p>识别市场增长潜力最大的机会领域</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>运动营养</h4>
+                        <p>蛋白棒年销6.0亿<br>CR5仅46.9%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>免疫支持</h4>
+                        <p>初乳年销9137万<br>集中度43.4%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>抗衰老</h4>
+                        <p>NAD年销1.22亿<br>半年43款新品</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>消化健康</h4>
+                        <p>消化酶年销3.05亿<br>CR5仅39.7%</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>1. 运动营养与体重管理领域</h3>
+                    <div class="highlight-box">
+                        <h4>🏃‍♂️ 核心机会产品</h4>
+                        <ul>
+                            <li><strong>蛋白棒：</strong>年销售额6.0亿，CR5占46.9%，市场相对分散</li>
+                            <li><strong>蛋白质薯片：</strong>年销约8555万，Top5品牌占83.8%</li>
+                            <li><strong>减肥饮料混合物：</strong>年销40万，解决节食者痛点</li>
+                            <li><strong>卡宴辣椒滴剂：</strong>5月销售是平均月销3.56倍</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>分析：</strong>随着大众对健身塑形的重视，新型运动营养和健康零食层出不穷。传统市场虽有大品牌耕耘，但消费者偏好不断演变，给予新品牌通过配方升级（如更高蛋白、更好口味）进入市场的机会。新产品增长迅猛，但总体竞争格局未定，新进入者可以细分定位打造差异化品牌。</p>
+
+                    <div class="tip-box">
+                        <h4>💡 进入策略</h4>
+                        <p>新品牌若能解决口感和功效平衡，有望在细分赛道迅速突围。可以专注某种运动人群或饮食方案，通过细分定位+产品创新实现差异化。</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>2. 免疫支持与天然抗菌领域</h3>
+                    <div class="highlight-box">
+                        <h4>🛡️ 核心机会产品</h4>
+                        <ul>
+                            <li><strong>初乳：</strong>年销售9137万，市场集中度仅43.4%</li>
+                            <li><strong>牛至油+黑籽油：</strong>年销约2312万，5月销量接近年均2倍</li>
+                            <li><strong>辣木胶囊：</strong>天然复合维生素，增强免疫</li>
+                            <li><strong>蘑菇提取物：</strong>药用菇多糖增强免疫</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>分析：</strong>免疫与抗菌细分市场在后疫情时代需求旺盛，但各产品功能各异、百花齐放，目前尚未出现绝对垄断者。新品牌可以选择细分切入口：专注呼吸道免疫或肠道免疫。天然植物提取物受欢迎趋势明显，消费者倾向"回归自然"。</p>
+
+                    <div class="opportunity-box">
+                        <h4>🌿 差异化机会</h4>
+                        <p>通过聚焦特定功效并建立科学背书，新品牌有机会在细分领域树立专业形象。在营销上突出安全性和传统医学依据，易获得信任，从而在免疫保健红海中找到蓝海切入点。</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>3. 抗衰老与认知功能领域</h3>
+                    <div class="highlight-box">
+                        <h4>🧠 核心机会产品</h4>
+                        <ul>
+                            <li><strong>NAD补充剂：</strong>年销1.22亿，半年内43款新品</li>
+                            <li><strong>亚甲蓝：</strong>年销约2463万，5月销售是平均月销2倍以上</li>
+                            <li><strong>蘑菇咖啡：</strong>年销1.13亿，认知功能从小众走向大众</li>
+                            <li><strong>NAD+白藜芦醇：</strong>受科研前沿推动的复合配方</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>分析：</strong>抗衰老与大脑健康细分市场技术壁垒较高，但正处于增长快车道。由于涉及前沿成分，新进入者有机会通过独特配方组合或新剂型形成差异。该领域消费者乐于尝试新品，只要产品有科学依据和显著功效，就可能迅速获取口碑。</p>
+
+                    <div class="warning-box">
+                        <h4>⚠️ 进入门槛</h4>
+                        <p>该领域技术含量较高，需要科研背书和专家认可。核心消费群体是追求认知提升和长寿的人群，他们受科研影响愿意尝鲜，注重产品科技含量和理论依据。</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>4. 消化健康领域</h3>
+                    <div class="highlight-box">
+                        <h4>🍽️ 核心机会产品</h4>
+                        <ul>
+                            <li><strong>消化酶：</strong>年销售额3.05亿，前五占比仅39.7%，高度分散</li>
+                            <li><strong>木瓜酶咀嚼片：</strong>年销约3000万，CR5达86.9%</li>
+                            <li><strong>新形式产品：</strong>酶类软糖、复合益生元配方等新兴形式</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>分析：</strong>消化健康市场基数大且刚需稳定，新品牌若能推出更便捷或趣味的产品（例如餐后嚼一粒的酶糖，或添加益生元纤维的综合消化粉），有机会在细分领域脱颖而出。虽然传统产品新品不多，但这反映的是守成品牌居多，新锐品牌依然可以通过产品形态创新获取年轻消费者青睐。</p>
+
+                    <div class="tip-box">
+                        <h4>💡 创新方向</h4>
+                        <p>结合东方草本（山楂丸、陈皮酊等）与西方酶制剂的跨界配方，或主打针对特定饮食场景（如烧烤宴、火锅后专用）的定制化产品，都可能成为差异化亮点。</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>5. 呼吸系统保健领域</h3>
+                    <div class="highlight-box">
+                        <h4>🫁 核心机会产品</h4>
+                        <ul>
+                            <li><strong>毛蕊花滴剂：</strong>年销约1777万，半年新品15款</li>
+                            <li><strong>毛蕊花软糖：</strong>年销349万，半年新品30款</li>
+                            <li><strong>市场特点：</strong>CR5仅约48%，缺乏大型玩家</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>分析：</strong>呼吸保健在传统保健品中是相对薄弱环节，但需求正在被教育出来。毛蕊花作为传统草药被赋予"清肺"功效，新品牌可围绕这一功能点深耕，通过不同剂型满足不同场景。由于这一领域产品口感是痛点，软糖化的成功经验表明提升体验能扩大受众面。</p>
+
+                    <div class="opportunity-box">
+                        <h4>🌱 市场前景</h4>
+                        <p>随着大众养生观念从内脏养护延伸到呼吸系统，这一细分有望涌现专业品牌。新进入者布局有先发优势，应强调"天然、安全、好入口"，在满足功能的同时注重产品的服用感受。</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>机会领域共同特征</h3>
+                    <div class="highlight-box">
+                        <h4>📈 成功因素分析</h4>
+                        <ul>
+                            <li><strong>需求真实且增长：</strong>这些细分对应的健康需求广泛存在，并呈上升趋势，体现在销售额同比高增或单月销量快速攀升</li>
+                            <li><strong>竞争格局未定：</strong>许多细分领域的品牌集中度低于50%，或虽有大牌但无法"一统天下"</li>
+                            <li><strong>产品创新驱动：</strong>机会产品多数在配方或形式上有创新，使得过去未被满足的用户需求得到满足</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-box">
+                        <h4>🎯 战略建议</h4>
+                        <p>保健品市场正由"大而全"走向"专而新"。在细分领域深耕、抓住尚未被充分服务的需求点，并辅以独特产品形式的新品牌，极有可能在竞争中脱颖而出。建议选择2-3个维度进行深度挖掘，通过定量数据佐证和定性趋势判断，在上述机会领域建立差异化竞争优势。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 返回顶部按钮 -->
+        <button class="back-to-top" id="backToTop">↑</button>
+    </div>
+
+    <script>
+        // 导航功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const searchInput = document.getElementById('searchInput');
+            const backToTop = document.getElementById('backToTop');
+            const functionFilter = document.getElementById('functionFilter');
+
+            // 导航切换
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有活动状态
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    contentSections.forEach(s => s.classList.remove('active'));
+                    
+                    // 添加活动状态
+                    this.classList.add('active');
+                    const targetSection = document.getElementById(this.dataset.section);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                    
+                    // 滚动到顶部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const allText = document.querySelectorAll('.content-card p, .content-card h3, .content-card h4, .content-card li, .data-table td');
+                
+                allText.forEach(element => {
+                    const text = element.textContent.toLowerCase();
+                    if (text.includes(searchTerm) && searchTerm.length > 0) {
+                        element.style.backgroundColor = '#fff3cd';
+                        element.style.padding = '2px 4px';
+                        element.style.borderRadius = '3px';
+                    } else {
+                        element.style.backgroundColor = '';
+                        element.style.padding = '';
+                        element.style.borderRadius = '';
+                    }
+                });
+            });
+
+            // 功效筛选
+            if (functionFilter) {
+                functionFilter.addEventListener('change', function() {
+                    const selectedCategory = this.value;
+                    const tableRows = document.querySelectorAll('#functionTable tbody tr');
+                    
+                    tableRows.forEach(row => {
+                        if (selectedCategory === '' || row.dataset.category === selectedCategory) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // 返回顶部功能
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 表格行悬停效果
+            const tableRows = document.querySelectorAll('.data-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                const shortcuts = {
+                    '1': 'function',
+                    '2': 'target', 
+                    '3': 'system',
+                    '4': 'ingredient',
+                    '5': 'dosage',
+                    '6': 'opportunity'
+                };
+                
+                if (shortcuts[e.key]) {
+                    e.preventDefault();
+                    const targetLink = document.querySelector(`[data-section="${shortcuts[e.key]}"]`);
+                    if (targetLink) {
+                        targetLink.click();
+                    }
+                }
+            }
+        });
+
+        // 数据可视化（简单的统计数字动画）
+        function animateNumbers() {
+            const statCards = document.querySelectorAll('.stat-card h4');
+            
+            statCards.forEach(card => {
+                const finalValue = card.textContent;
+                if (finalValue.includes('+')) {
+                    const number = parseInt(finalValue.replace('+', ''));
+                    animateValue(card, 0, number, 1000, '+');
+                }
+            });
+        }
+
+        function animateValue(element, start, end, duration, suffix = '') {
+            const startTimestamp = performance.now();
+            
+            function step(timestamp) {
+                const elapsed = timestamp - startTimestamp;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                
+                element.textContent = current + suffix;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // 页面加载完成后执行动画
+        window.addEventListener('load', function() {
+            setTimeout(animateNumbers, 500);
+        });
+    </script>
+</body>
