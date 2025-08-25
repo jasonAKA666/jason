@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机支架竞品数据分析报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: #fafbfc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            font-weight: 500;
+        }
+        .chart-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .chart-container {
+            flex: 1;
+            min-width: 400px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chart-container h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #34495e;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+        .insight-box {
+            background: #e8f4fd;
+            border: 1px solid #3498db;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .insight-box h4 {
+            color: #2980b9;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .insight-box p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-card .label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .heatmap-container {
+            overflow-x: auto;
+        }
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        .heatmap-table th,
+        .heatmap-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .heatmap-table th {
+            background: #34495e;
+            color: white;
+            font-weight: 500;
+        }
+        .heat-cell {
+            position: relative;
+            color: white;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .chart-row {
+                flex-direction: column;
+            }
+            .chart-container {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>手机支架竞品数据分析报告</h1>
+            <p>基于美国市场最近30天的96个竞品数据深度分析</p>
+        </div>
+        
+        <div class="content">
+            <!-- 1. 安装方式销量份额 & 趋势 -->
+            <div class="section">
+                <h2>1. 安装方式销量份额 & 趋势分析</h2>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>安装方式销量份额（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="installationShareChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>安装方式月度销量趋势（全部14种安装方式）</h3>
+                        <div class="chart-wrapper" style="height: 500px;">
+                            <canvas id="installationTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>市场共有14种安装方式，其中吸盘式+按压真空锁+出风口夹式（7月销量91,000）和纯出风口夹式（7月销量79,000）是绝对主导，合计占据市场半数以上份额。从趋势看，吸盘式+旋钮真空锁增长最为迅猛（从1月6,550增至7月72,000），杯架式也呈现强劲增长（从1月17,900增至7月35,000），而仪表台夹式表现波动较大。</p>
+                </div>
+            </div>
+
+            <!-- 2. 固定结构销量份额 & 趋势 -->
+            <div class="section">
+                <h2>2. 固定结构销量份额 & 趋势分析</h2>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>固定结构销量份额（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="structureShareChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>固定结构月度销量趋势</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="structureTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>夹持式仍是主流固定方式，但磁吸式增长迅速，显示出消费者对便利性的需求提升。</p>
+                </div>
+            </div>
+
+            <!-- 3. 无线充电支持情况 -->
+            <div class="section">
+                <h2>3. 无线充电支持情况销量演变</h2>
+                <div class="chart-row">
+                    <div class="chart-container" style="flex: 2;">
+                        <h3>无线充电支持vs不支持月度销量对比</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="wirelessChargingChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>支持无线充电的产品销量占比极小，但呈现上升趋势，可能是未来的增长点。</p>
+                </div>
+            </div>
+
+            <!-- 4. 价格带销量分布 -->
+            <div class="section">
+                <h2>4. 价格带销量分布（价格敏感度分析）</h2>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>不同价格带销量分布（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="priceDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>10-30美元价格带是主要市场，显示消费者对手机支架的价格敏感度适中，愿意为品质支付合理价格。</p>
+                </div>
+            </div>
+
+            <!-- 5. 评分区间销量结构 -->
+            <div class="section">
+                <h2>5. 评分区间销量结构分析</h2>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>评分区间销量分布（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="ratingDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>评分数区间销量分布（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="ratingCountDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p><strong>评分分析：</strong>4.3-4.5分产品占据绝对主导地位（1,148,100销量，占比56.3%），其次是4.0-4.3分产品（705,900销量，占比34.6%）。<strong>头部护城河效应：</strong>5000+评分数的产品占绝对主导（1,499,000销量，占比73%），1000-5000评分数产品占20%，低评分数产品合计仅7%。这充分证明了头部产品的护城河效应——评论数多的成熟产品在销量上形成绝对优势，新品很难撼动头部地位。</p>
+                </div>
+            </div>
+
+            <!-- 6. 产品生命周期分析 -->
+            <div class="section">
+                <h2>6. 产品生命周期分析（上架天数区间）</h2>
+                <div class="chart-row">
+                    <div class="chart-container" style="flex: 2;">
+                        <h3>上架天数区间销量结构（2025年7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="lifecycleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>基于7月份销量数据，100-500天（105,500）和1000-2000天（105,000）的产品表现最强，500-1000天的中期产品也表现良好（101,000）。新品（0-100天）虽然数量较少但发展势头不错（14,100），超过2000天的老产品销量开始下降（57,000），完美体现了产品生命周期的典型规律：成长期→成熟期→衰退期。</p>
+                </div>
+            </div>
+
+            <!-- 7. 套装数量渗透分析 -->
+            <div class="section">
+                <h2>7. 套装数量渗透与提升分析</h2>
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>套装vs单件销量份额（2025年1-7月份）</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="packageShareChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>套装数量月度销量趋势</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="packageTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>单件产品占绝对主导，套装产品市场份额很小，可能存在套装营销的机会。</p>
+                </div>
+            </div>
+
+            <!-- 8. 交叉维度分析 -->
+            <div class="section">
+                <h2>8. 安装方式 × 固定结构交叉分析</h2>
+                <div class="heatmap-container">
+                    <h3>安装方式与固定结构组合销量热力图（2025年1-7月份）</h3>
+                    <table class="heatmap-table" id="crossDimensionTable">
+                        <!-- 将通过JavaScript动态生成 -->
+                    </table>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>吸盘式+按压真空锁+出风口夹式×夹持式是绝对主导组合（484,900销量），其次是出风口夹式×夹持式（318,500）和吸盘式+旋钮真空锁×磁吸式（246,400）。夹持式固定结构在高销量组合中占主导，但磁吸式在某些安装方式中也表现突出，体现了不同用户对稳定性vs便利性的不同需求。</p>
+                </div>
+            </div>
+
+            <!-- 9. 增长贡献分析 -->
+            <div class="section">
+                <h2>9. 7月增长贡献分解（vs 6月）</h2>
+                <div class="chart-row">
+                    <div class="chart-container" style="flex: 2;">
+                        <h3>主要品牌7月vs6月销量增长贡献</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="growthContributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 关键洞察</h4>
+                    <p>7月相比6月，Jononser（+6,000）和YAOKEEP（+5,450）增长最为突出，多个品牌实现4,000+的增长，显示市场活力。而MRGLAS(-4,000)、ACMEZING(-2,000)等品牌出现下滑，市场竞争加剧。整体上增长品牌多于下滑品牌，市场呈现积极态势。</p>
+                </div>
+            </div>
+
+            <!-- 总结 -->
+            <div class="section">
+                <h2>📊 核心数据总览</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="number">96</div>
+                        <div class="label">分析产品数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">383K</div>
+                        <div class="label">7月销量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">58</div>
+                        <div class="label">竞争品牌数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">12</div>
+                        <div class="label">可视化图表</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 修正后的分析数据
+            const analysisData = {
+                "installation_totals": {"吸盘式+按压真空锁+出风口夹式": 519900, "出风口夹式": 511500, "吸盘式+旋钮真空锁": 251900, "吸盘式": 218000, "杯架式": 156700, "吸盘式+按压真空锁": 111800, "吸盘式+出风口夹式": 90700, "吸盘式+旋钮真空锁+出风口夹式": 52000, "仪表台夹式": 43600, "仪表台垫子式": 34000, "后视镜式": 27350, "CD槽式": 18000, "屏幕夹式": 1500, "电动吸盘式": 0},
+                "installation_trends": {"吸盘式+按压真空锁+出风口夹式": {"1月": 63100, "2月": 64800, "3月": 70500, "4月": 69500, "5月": 78500, "6月": 82500, "7月": 91000}, "出风口夹式": {"1月": 73000, "2月": 72000, "3月": 70500, "4月": 72500, "5月": 70000, "6月": 74500, "7月": 79000}, "吸盘式+旋钮真空锁": {"1月": 6550, "2月": 13800, "3月": 23600, "4月": 33300, "5月": 44500, "6月": 58150, "7月": 72000}, "吸盘式": {"1月": 27500, "2月": 32000, "3月": 32000, "4月": 32000, "5月": 24500, "6月": 34000, "7月": 36000}, "杯架式": {"1月": 17900, "2月": 16500, "3月": 18400, "4月": 18400, "5月": 20500, "6月": 30000, "7月": 35000}, "吸盘式+按压真空锁": {"1月": 18100, "2月": 12100, "3月": 13200, "4月": 13100, "5月": 15300, "6月": 18500, "7月": 21500}, "吸盘式+出风口夹式": {"1月": 12500, "2月": 11200, "3月": 11500, "4月": 12500, "5月": 13000, "6月": 14000, "7月": 16000}, "吸盘式+旋钮真空锁+出风口夹式": {"1月": 4000, "2月": 6000, "3月": 6000, "4月": 7000, "5月": 9000, "6月": 10000, "7月": 10000}, "仪表台夹式": {"1月": 7000, "2月": 5500, "3月": 8000, "4月": 6000, "5月": 4500, "6月": 3500, "7月": 9100}, "仪表台垫子式": {"1月": 4000, "2月": 4000, "3月": 5000, "4月": 5000, "5月": 6000, "6月": 5000, "7月": 5000}, "后视镜式": {"1月": 5000, "2月": 5050, "3月": 4100, "4月": 3400, "5月": 3300, "6月": 2500, "7月": 4000}, "CD槽式": {"1月": 2000, "2月": 2000, "3月": 3000, "4月": 2000, "5月": 3000, "6月": 3000, "7月": 3000}, "屏幕夹式": {"1月": 0, "2月": 0, "3月": 0, "4月": 0, "5月": 0, "6月": 500, "7月": 1000}, "电动吸盘式": {"1月": 0, "2月": 0, "3月": 0, "4月": 0, "5月": 0, "6月": 0, "7月": 0}},
+                "structure_totals": {"夹持式": 1195350, "磁吸式": 807600, "仪表台垫子式": 34000},
+                "structure_trends": {"夹持式": {"1月": 154600, "2月": 149450, "3月": 160700, "4月": 159400, "5月": 171100, "6月": 187500, "7月": 212600}, "磁吸式": {"1月": 82050, "2月": 91500, "3月": 100100, "4月": 110300, "5月": 115000, "6月": 143650, "7月": 165000}, "仪表台垫子式": {"1月": 4000, "2月": 4000, "3月": 5000, "4月": 5000, "5月": 6000, "6月": 5000, "7月": 5000}},
+                "wireless_charging": {"不支持无线充电": {"1月": 236150, "2月": 240750, "3月": 261300, "4月": 271200, "5月": 288100, "6月": 330150, "7月": 373600}, "支持无线充电": {"1月": 4500, "2月": 4200, "3月": 4500, "4月": 3500, "5月": 4000, "6月": 6000, "7月": 9000}},
+                "price_distribution": {"0-10$": 505500, "10-20$": 737650, "20-30$": 752700, "30-40$": 41100, "40$+": 0},
+                "rating_distribution": {"3.0-3.5": 8550, "3.5-4.0": 56100, "4.0-4.3": 705900, "4.3-4.5": 1148100, "4.5+": 118300},
+                "rating_count_distribution": {"0-75": 1650, "75-200": 5600, "200-500": 56600, "500-1000": 58800, "1000-5000": 415300, "5000+": 1499000},
+                "lifecycle_july": {"0-100天": 14100, "100-500天": 105500, "500-1000天": 101000, "1000-2000天": 105000, "2000天+": 57000},
+                "package_totals": {"1件套": 2000950, "2件套": 36000},
+                "package_trends": {"1件套": {"1月": 235650, "2月": 240950, "3月": 259800, "4月": 269700, "5月": 286100, "6月": 330150, "7月": 378600}, "2件套": {"1月": 5000, "2月": 4000, "3月": 6000, "4月": 5000, "5月": 6000, "6月": 6000, "7月": 4000}},
+                "growth_contribution": {"Jononser": 6000, "YAOKEEP": 5450, "snanlen": 4000, "Gipsot": 4000, "VICSEED": 4000, "Coolpow": 4000, "GUWEZ": -1000, "Oudvaker": -1000, "Romuto": -2000, "ACMEZING": -2000, "BothLin": -2000, "MRGLAS": -4000}
+            };
+
+            // 图表配置
+            const chartColors = {
+                primary: '#667eea',
+                secondary: '#764ba2',
+                success: '#48bb78',
+                warning: '#ed8936',
+                error: '#f56565',
+                info: '#4299e1',
+                gradient: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c', '#34495e']
+            };
+
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月'];
+
+            // 1. 安装方式份额图
+            const installationData = analysisData.installation_totals;
+            const topInstallations = Object.entries(installationData)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 8);
+
+            new Chart(document.getElementById('installationShareChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: topInstallations.map(([key]) => key),
+                    datasets: [{
+                        data: topInstallations.map(([,value]) => value),
+                        backgroundColor: chartColors.gradient,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. 安装方式趋势图 - 显示所有安装方式
+            const installationTrendData = analysisData.installation_trends;
+            const allInstallationMethods = Object.keys(installationTrendData);
+
+            new Chart(document.getElementById('installationTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: allInstallationMethods.map((method, index) => ({
+                        label: method,
+                        data: months.map(month => installationTrendData[method][month] || 0),
+                        borderColor: chartColors.gradient[index % chartColors.gradient.length],
+                        backgroundColor: chartColors.gradient[index % chartColors.gradient.length] + '20',
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + (context.raw / 1000).toFixed(1) + 'K';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3. 固定结构份额图
+            const structureData = analysisData.structure_totals;
+            new Chart(document.getElementById('structureShareChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(structureData),
+                    datasets: [{
+                        data: Object.values(structureData),
+                        backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.success],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 4. 固定结构趋势图
+            const structureTrendData = analysisData.structure_trends;
+            new Chart(document.getElementById('structureTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: Object.keys(structureTrendData).map((structure, index) => ({
+                        label: structure,
+                        data: months.map(month => structureTrendData[structure][month]),
+                        borderColor: [chartColors.primary, chartColors.secondary, chartColors.success][index],
+                        backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.success][index] + '20',
+                        fill: false,
+                        tension: 0.4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 5. 无线充电支持情况
+            const wirelessData = analysisData.wireless_charging;
+            new Chart(document.getElementById('wirelessChargingChart'), {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: Object.keys(wirelessData).map((type, index) => ({
+                        label: type,
+                        data: months.map(month => wirelessData[type][month]),
+                        backgroundColor: [chartColors.primary, chartColors.warning][index],
+                        borderColor: [chartColors.primary, chartColors.warning][index],
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { 
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 6. 价格分布
+            const priceData = analysisData.price_distribution;
+            new Chart(document.getElementById('priceDistributionChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(priceData),
+                    datasets: [{
+                        label: '销量',
+                        data: Object.values(priceData),
+                        backgroundColor: chartColors.gradient,
+                        borderColor: chartColors.primary,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // 7. 评分分布
+            const ratingData = analysisData.rating_distribution;
+            new Chart(document.getElementById('ratingDistributionChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(ratingData),
+                    datasets: [{
+                        label: '销量',
+                        data: Object.values(ratingData),
+                        backgroundColor: chartColors.gradient,
+                        borderColor: chartColors.primary,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // 8. 评分数分布
+            const ratingCountData = analysisData.rating_count_distribution;
+            new Chart(document.getElementById('ratingCountDistributionChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(ratingCountData),
+                    datasets: [{
+                        label: '销量',
+                        data: Object.values(ratingCountData),
+                        backgroundColor: chartColors.gradient,
+                        borderColor: chartColors.primary,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // 9. 生命周期分析（基于7月份销量）
+            const lifecycleData = analysisData.lifecycle_july;
+            // 按逻辑顺序排列生命周期阶段
+            const lifecycleOrder = ['0-100天', '100-500天', '500-1000天', '1000-2000天', '2000天+'];
+            const orderedLifecycleData = lifecycleOrder.map(stage => lifecycleData[stage] || 0);
+            
+            new Chart(document.getElementById('lifecycleChart'), {
+                type: 'bar',
+                data: {
+                    labels: lifecycleOrder,
+                    datasets: [{
+                        label: '7月份销量',
+                        data: orderedLifecycleData,
+                        backgroundColor: chartColors.gradient,
+                        borderColor: chartColors.primary,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+
+
+            // 11. 套装份额
+            const packageData = analysisData.package_totals;
+            new Chart(document.getElementById('packageShareChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(packageData),
+                    datasets: [{
+                        data: Object.values(packageData),
+                        backgroundColor: [chartColors.primary, chartColors.secondary],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 12. 套装趋势
+            const packageTrendData = analysisData.package_trends;
+            new Chart(document.getElementById('packageTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: Object.keys(packageTrendData).map((type, index) => ({
+                        label: type,
+                        data: months.map(month => packageTrendData[type][month]),
+                        borderColor: [chartColors.primary, chartColors.secondary][index],
+                        backgroundColor: [chartColors.primary, chartColors.secondary][index] + '20',
+                        fill: false,
+                        tension: 0.4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 13. 增长贡献分析
+            const growthData = analysisData.growth_contribution;
+            const growthBrands = Object.entries(growthData);
+
+            new Chart(document.getElementById('growthContributionChart'), {
+                type: 'bar',
+                data: {
+                    labels: growthBrands.map(([brand]) => brand),
+                    datasets: [{
+                        label: '7月vs6月销量变化',
+                        data: growthBrands.map(([,growth]) => growth),
+                        backgroundColor: growthBrands.map(([,growth]) => 
+                            growth >= 0 ? chartColors.success : chartColors.error
+                        ),
+                        borderColor: growthBrands.map(([,growth]) => 
+                            growth >= 0 ? chartColors.success : chartColors.error
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // 生成交叉维度热力图表格
+            function generateCrossDimensionTable() {
+                const crossData = {
+                    "吸盘式+按压真空锁+出风口夹式_夹持式": 484900,
+                    "出风口夹式_夹持式": 318500,
+                    "吸盘式+旋钮真空锁_磁吸式": 246400,
+                    "吸盘式_磁吸式": 218000,
+                    "出风口夹式_磁吸式": 193000,
+                    "杯架式_夹持式": 156700,
+                    "吸盘式+出风口夹式_磁吸式": 90700,
+                    "吸盘式+按压真空锁_夹持式": 88800,
+                    "吸盘式+旋钮真空锁+出风口夹式_夹持式": 52000,
+                    "仪表台夹式_夹持式": 43600,
+                    "吸盘式+按压真空锁+出风口夹式_磁吸式": 35000,
+                    "仪表台垫子式_仪表台垫子式": 34000,
+                    "后视镜式_夹持式": 27350,
+                    "吸盘式+按压真空锁_磁吸式": 23000,
+                    "CD槽式_夹持式": 18000,
+                    "吸盘式+旋钮真空锁_夹持式": 5500,
+                    "屏幕夹式_磁吸式": 1500,
+                    "电动吸盘式_磁吸式": 0
+                };
+
+                const table = document.getElementById('crossDimensionTable');
+                
+                // 解析数据结构
+                const combinations = {};
+                Object.entries(crossData).forEach(([key, value]) => {
+                    const [installation, structure] = key.split('_');
+                    if (!combinations[installation]) {
+                        combinations[installation] = {};
+                    }
+                    combinations[installation][structure] = value;
+                });
+
+                // 获取所有安装方式和固定结构
+                const installations = Object.keys(combinations);
+                const structures = [...new Set(Object.values(combinations).flatMap(obj => Object.keys(obj)))];
+                
+                // 创建表头
+                let html = '<tr><th>安装方式 \\ 固定结构</th>';
+                structures.forEach(structure => {
+                    html += `<th>${structure}</th>`;
+                });
+                html += '</tr>';
+
+                // 创建数据行
+                installations.forEach(installation => {
+                    html += `<tr><th>${installation}</th>`;
+                    structures.forEach(structure => {
+                        const value = combinations[installation]?.[structure] || 0;
+                        const intensity = value > 0 ? Math.min(value / 200000, 1) : 0;
+                        const bgColor = `rgba(102, 126, 234, ${intensity})`;
+                        const textColor = intensity > 0.5 ? 'white' : 'black';
+                        html += `<td class="heat-cell" style="background-color: ${bgColor}; color: ${textColor};">${(value/1000).toFixed(0)}K</td>`;
+                    });
+                    html += '</tr>';
+                });
+
+                table.innerHTML = html;
+            }
+
+            // 生成热力图
+            generateCrossDimensionTable();
+        });
+    </script>
+</body>
+</html>
